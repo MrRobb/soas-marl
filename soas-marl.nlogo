@@ -1,10 +1,64 @@
-globals [barrier-color-red barrier-color-green barrier-color-yellow]
+globals [barrier-color-red
+         barrier-color-green
+         barrier-color-yellow
+         keypressed
+         num-manual-agents
+         cur-manual-agent
+         list-manual-agents
+         goal-reached-q0
+         goal-reached-q1
+         goal-reached-q2
+        ]
 
 ;define agents breed last so they're drawn over the buttons
 breed [buttons button]
+breed [goals goal]
+breed [manual-agents manual-agent]
+
+buttons-own [ bq ]
+goals-own [ bq ]
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Interactive Version             ;
+; (go and handle-input functions) ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+to go
+  handle-input
+  check-buttons
+  check-goals
+end
+
+; debug interactive test of environment
+; need to set view update to "continuous"
+to handle-input
+  if keypressed != 0
+  [
+    ; select next agent when space pressed
+    if keypressed = 5
+    [ set cur-manual-agent ((cur-manual-agent + 1) mod num-manual-agents)]
+    let selected-manual-agent item cur-manual-agent list-manual-agents
+
+    if keypressed = 1
+    [ ask selected-manual-agent [move-up] ]
+    if keypressed = 2
+    [ ask selected-manual-agent [move-down] ]
+    if keypressed = 3
+    [ ask selected-manual-agent [move-left] ]
+    if keypressed = 4
+    [ ask selected-manual-agent [move-right] ]
+
+    set keypressed 0
+  ]
+end
 
 to setup
   clear-all
+  set keypressed 0
+  set cur-manual-agent 0
+  set num-manual-agents 3
+  set goal-reached-q0 false
+  set goal-reached-q1 false
+  set goal-reached-q2 false
 
   ; define constants
   set barrier-color-red 13
@@ -31,8 +85,76 @@ to setup
     enable-green-barrier q true
     enable-red-barrier q true
     enable-yellow-barrier q true
+    ; and goal
+    create-goal q
   ]
 
+  ; create agents
+  create-manual-agent 0 1 10
+  create-manual-agent 0 5 10
+  create-manual-agent 0 9 10
+  set list-manual-agents sort manual-agents
+end
+
+to check-buttons
+  ask buttons
+  [
+    ifelse color = red
+    [
+      if (count (turtles-on patch-here) with [breed != buttons]) >= 2
+      [
+        enable-red-barrier bq false
+      ]
+    ]
+    [
+      if (count (turtles-on patch-here) with [breed != buttons]) >= 1
+      [
+        if color = yellow
+        [
+          enable-yellow-barrier bq false
+        ]
+        if color = green
+        [
+          enable-green-barrier bq false
+        ]
+      ]
+    ]
+
+    ;let all-agents-here turtles-on patch-here
+    ;count show all-agents-here with [breed != buttons]
+
+  ]
+end
+
+to check-goals
+  ask goals
+  [
+    if (count (turtles-on patch-here) with [breed != goals]) >= 1
+    [
+      goal-reached bq
+    ]
+  ]
+end
+
+to goal-reached [q]
+  if q = 0
+  [
+    if not goal-reached-q0
+    [ show "Goal reached Q0!" ]
+    set goal-reached-q0 true
+  ]
+  if q = 1
+  [
+    if not goal-reached-q1
+    [ show "Goal reached Q1!" ]
+    set goal-reached-q1 true
+  ]
+  if q = 2
+  [
+    if not goal-reached-q2
+    [ show "Goal reached Q2!" ]
+    set goal-reached-q2 true
+  ]
 end
 
 
@@ -68,6 +190,41 @@ to-report bg-color
   report white
 end
 
+to create-manual-agent [quadrant x y]
+  create-manual-agents 1  ; create one manual agent
+  [
+    let qx 0
+    let qy 0
+    if quadrant = 1 or quadrant = 3
+    [ set qx 12 ]
+    if quadrant = 0 or quadrant = 1
+    [ set qy 12 ]
+
+    set shape  "person"
+    set color blue
+    set size 1.25  ; easier to see
+    setxy ((x mod 12) + qx) ((y mod 12) + qy)
+  ]
+end
+
+to create-goal [quadrant]
+  create-goals 1  ; create goal
+  [
+    let qx 0
+    let qy 0
+    if quadrant = 1 or quadrant = 3
+    [ set qx 12 ]
+    if quadrant = 0 or quadrant = 1
+    [ set qy 12 ]
+
+    set shape  "target"
+    set color lime
+    set size 1.5  ; easier to see
+    setxy (9 + qx) (2 + qy)
+    set bq quadrant
+  ]
+end
+
 to create-green-button [quadrant]
   create-buttons 1  ; create green button
   [
@@ -82,6 +239,7 @@ to create-green-button [quadrant]
     set color green
     set size 2  ; easier to see
     setxy (7 + qx) (5 + qy)
+    set bq quadrant
   ]
 end
 
@@ -99,6 +257,7 @@ to create-yellow-button [quadrant]
     set color yellow
     set size 2  ; easier to see
     setxy (3 + qx) (10 + qy)
+    set bq quadrant
   ]
 end
 
@@ -116,6 +275,7 @@ to create-red-button [quadrant]
     set color red
     set size 2  ; easier to see
     setxy (10 + qx) (4 + qy)
+    set bq quadrant
   ]
 end
 
@@ -175,6 +335,54 @@ end
 to lower-green
   enable-green-barrier 0 false
 end
+
+to move-up
+  let move-ok false
+  ask patch xcor (ycor + 1)
+  [
+    if pcolor = white
+    [ set move-ok true]
+  ]
+
+  if move-ok
+  [ set ycor ycor + 1]
+end
+
+to move-down
+  let move-ok false
+  ask patch xcor (ycor - 1)
+  [
+    if pcolor = white
+    [ set move-ok true]
+  ]
+
+  if move-ok
+  [ set ycor ycor - 1]
+end
+
+to move-left
+  let move-ok false
+  ask patch (xcor - 1) ycor
+  [
+    if pcolor = white
+    [ set move-ok true]
+  ]
+
+  if move-ok
+  [ set xcor xcor - 1]
+end
+
+to move-right
+  let move-ok false
+  ask patch (xcor + 1) ycor
+  [
+    if pcolor = white
+    [ set move-ok true]
+  ]
+
+  if move-ok
+  [ set xcor xcor + 1]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -197,8 +405,8 @@ GRAPHICS-WINDOW
 23
 0
 23
-1
-1
+0
+0
 1
 ticks
 30.0
@@ -262,6 +470,108 @@ BUTTON
 NIL
 lower-yellow
 NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+82
+338
+157
+371
+UP
+set keypressed 1
+NIL
+1
+T
+OBSERVER
+NIL
+I
+NIL
+NIL
+1
+
+BUTTON
+18
+371
+82
+404
+LEFT
+set keypressed 3
+NIL
+1
+T
+OBSERVER
+NIL
+J
+NIL
+NIL
+1
+
+BUTTON
+82
+371
+157
+404
+DOWN
+set keypressed 2
+NIL
+1
+T
+OBSERVER
+NIL
+K
+NIL
+NIL
+1
+
+BUTTON
+157
+371
+222
+404
+RIGHT
+set keypressed 4
+NIL
+1
+T
+OBSERVER
+NIL
+L
+NIL
+NIL
+1
+
+BUTTON
+56
+423
+190
+456
+Change Agent
+set keypressed 5
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+36
+71
+99
+104
+NIL
+go
+T
 1
 T
 OBSERVER
