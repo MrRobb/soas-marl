@@ -1,0 +1,10 @@
+# Built files
+bin/
+obj/
+
+# cscope/ctags
+tags
+cscope.out
+
+# vim stuff
+*.swp
