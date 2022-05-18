@@ -7,6 +7,7 @@
 #include <stdio.h>  // For debugging
 
 #include "ofMain.h"
+#include "ButtonsAgent.hpp"
 
 #define WHITE  0xffffff
 #define BLACK  0x000000
@@ -14,6 +15,7 @@
 #define GREEN  0x00ff00
 #define BLUE   0x0000ff
 #define YELLOW 0xffff00
+#define PURPLE 0xff33ff
 
 typedef enum
 {
@@ -63,6 +65,7 @@ private:
     CellType_e env_state[10][10] = {};  // Default to all empty cells. Fill in others in constructor.
 
     CellTypeInfo cell_info;
+    vector<ButtonsAgent> agents;
 
 public:
 	ButtonsEnvironment();
@@ -74,4 +77,5 @@ private:
     void enableGreenBarrier(bool _enable);
     void enableYellowBarrier(bool _enable);
     void enableRedBarrier(bool _enable);
+    void drawAgent(ofFbo _fbo, ButtonsAgent &_agent);
 };
