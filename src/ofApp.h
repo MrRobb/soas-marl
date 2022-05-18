@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include <vector>
-#include "Specimen.cpp"
+#include "ButtonsEnvironment.hpp"
 
 class ofApp : public ofBaseApp{
 
@@ -22,4 +22,13 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+
+    private:
+        static ofVec2f getEnvCoords(int index, int rows, int cols);
+
+private:
+    // Future: Make this an abstract Environment class. Not needed for this project.
+    vector<ButtonsEnvironment> envs;  // Environment objects
+    vector<ofVec2f> env_locs;         // Location where to draw each environment
+    vector<ofFbo> env_fbos;           // Frame buffers holding the rendered environment
 };

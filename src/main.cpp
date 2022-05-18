@@ -1,13 +1,24 @@
-#include "ofMain.h"
+//#include "ofMain.h"
 #include "ofApp.h"
 
+#include "soas_marl.h"
+
 //========================================================================
-int main( ){
-	ofSetupOpenGL(700,700,OF_WINDOW);			// <-------- setup the GL context
+int main( )
+{
+    ofGLFWWindowSettings settings;
+    settings.resizable = false;
+    settings.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    ofCreateWindow(settings);
 
-	// this kicks off the running of my app
-	// can be OF_WINDOW or OF_FULLSCREEN
-	// pass in width and height too:
-	ofRunApp(new ofApp());
+    // OF Init stuff
+    //ofSetVerticalSync(false);  // Don't want since we double-buffer and draw snapshots of env
+    ofSetFrameRate(FRAME_RATE);
+    //ofSetBackgroundColorHex(ofHexToInt("0D1B1E"));
+    ofSetBackgroundColorHex(ofHexToInt("000000"));  // Ideally, should match the wall colors in the env
 
+    // Other init stuff before starting app (singleton instantiation, global data, etc.)
+
+    // Run app
+    ofRunApp(new ofApp());
 }
