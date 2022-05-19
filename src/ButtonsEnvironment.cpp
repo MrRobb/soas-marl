@@ -125,6 +125,9 @@ void ButtonsEnvironment::tick()
 
     // Then, after applying movement, check for events (like button presses)
     updateEnvironment();
+
+    // Then, as a last step, generate random sync events
+    broadcastRandomEvent();
 }
 
 void ButtonsEnvironment::updateEnvironment()
@@ -150,6 +153,29 @@ void ButtonsEnvironment::updateEnvironment()
                 }
             }
         }
+    }
+}
+
+void ButtonsEnvironment::broadcastRandomEvent()
+{
+    if( cfg == TEAM_ENV ) return;
+
+    // For now, just generate a random button press with some probability. Will need to
+    // synchronize with reward machine events.
+    float random_val = 0;
+
+    // Choose to activate red, yellow or green button with 5% probability (multiple can be activated at once)
+    random_val = ofRandom(0,1);
+    if( (0 <= random_val) && (random_val <= 0.05) ) {
+        enableRedBarrier(false);
+    }
+    random_val = ofRandom(0,1);
+    if( (0 <= random_val) && (random_val <= 0.05) ) {
+        enableYellowBarrier(false);
+    }
+    random_val = ofRandom(0,1);
+    if( (0 <= random_val) && (random_val <= 0.05) ) {
+        enableGreenBarrier(false);
     }
 }
 

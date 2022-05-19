@@ -83,7 +83,8 @@ void ofApp::keyPressed(int key){
         for(int i=0; i<4; i++)
         {
             //envs[i].go(500000000, 20);  // Go for 20 ticks at 0.5 sec/tick
-            envs[i].go(100000000, 200);  // Go for 200 ticks at 0.1 sec/tick
+            //envs[i].go(100000000, 200);  // Go for 200 ticks at 0.1 sec/tick
+            envs[i].go(10000000, 200);  // Go for 200 ticks at 100 Hz
             //envs[i].go(0, 200);  // Go for 200 ticks as fast as CPU will allow
         }
     }

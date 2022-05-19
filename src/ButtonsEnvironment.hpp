@@ -125,6 +125,7 @@ public:
 	void go(uint64_t _timer_interval, int _tick_limit);
     bool isOpen(ofVec2f _loc);  // Check if agent can move into grid square
 	void updateEnvironment();    // Run automatic tasks like lowering barriers when buttons are pressed
+	void broadcastRandomEvent(); // TODO: Placeholder until I see how to integrate with Rob's code
 
 private:
     void enableGreenBarrier(bool _enable);
