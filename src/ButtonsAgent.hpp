@@ -18,16 +18,26 @@ typedef enum
     NUM_ACTIONS = 5
 } AgentAction_e;
 
+// Forward-declaration of environment
+class ButtonsEnvironment;
+
 
 class ButtonsAgent
 {
 public:
+    ButtonsEnvironment &env;
     ofVec2f location;
 
 private:
     // Probably stuff here like Q-Table
 
 public:
-	ButtonsAgent() {}  // Loc should be 0,0
-	ButtonsAgent(ofVec2f _init_loc) { location = _init_loc; }
+	ButtonsAgent(ButtonsEnvironment &_env) : env(_env) {}  // Loc should be 0,0
+	ButtonsAgent(ButtonsEnvironment &_env, ofVec2f _init_loc) :
+        env(_env),
+        location(_init_loc)
+    {}
+
+    void performAction(AgentAction_e _action);
+    // TODO: Maybe add a function to return a list of valid actions?
 };

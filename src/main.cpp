@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 //#include "ofMain.h"
 #include "ofApp.h"
 
@@ -18,6 +20,8 @@ int main( )
     ofSetBackgroundColorHex(ofHexToInt("000000"));  // Ideally, should match the wall colors in the env
 
     // Other init stuff before starting app (singleton instantiation, global data, etc.)
+    time_t t;
+    srand(time(&t));
 
     // Run app
     ofRunApp(new ofApp());

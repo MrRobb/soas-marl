@@ -4,6 +4,8 @@
 //
 //
 
+#include <stdlib.h>
+
 #include "ButtonsEnvironment.hpp"
 #include "soas_marl.h"
 
@@ -56,10 +58,15 @@ ButtonsEnvironment::ButtonsEnvironment() :
     env_state[8][8] = GOAL;
 
     // Initialize agents - TODO: May also want environments with just a single agent for training
-    agents = vector<ButtonsAgent>(3);
-    agents[0].location = ofVec2f(0,0);
-    agents[1].location = ofVec2f(5,0);
-    agents[2].location = ofVec2f(8,0);
+    agents.reserve(3);
+    agents.emplace_back(ButtonsAgent(*this, ofVec2f(0,0)));
+    agents.emplace_back(ButtonsAgent(*this, ofVec2f(5,0)));
+    agents.emplace_back(ButtonsAgent(*this, ofVec2f(8,0)));
+
+    yellow_button_loc = ofVec2f(2,0);
+    red_button_loc = ofVec2f(9,6);
+    green_button_loc = ofVec2f(6,5);
+    goal_loc = ofVec2f(8,8);
 }
 
 void ButtonsEnvironment::enableGreenBarrier(bool _enable)
@@ -84,6 +91,42 @@ void ButtonsEnvironment::tick()
 {
     // Run for one cycle
     // TODO: Add code here to have each agent choose their next move and update the environment accordingly
+
+    // Example: make each agent pick a random action each tick
+    for(uint32_t i=0; i<agents.size(); i++)
+    {
+        AgentAction_e action = (AgentAction_e)(rand() % NUM_ACTIONS);
+        agents[i].performAction(action);
+    }
+
+    // Then, after applying movement, check for events (like button presses)
+    updateEnvironment();
+}
+
+void ButtonsEnvironment::updateEnvironment()
+{
+    for(uint32_t i=0; i<agents.size(); i++)
+    {
+        if( agents[i].location == yellow_button_loc )
+        {
+            enableYellowBarrier(false);
+        }
+        if( agents[i].location == green_button_loc )
+        {
+            enableGreenBarrier(false);
+        }
+        if( agents[i].location == red_button_loc )
+        {
+            // Need to check for a second agent on it
+            for(uint32_t j=i+1; j<agents.size(); j++)
+            {
+                if( agents[j].location == red_button_loc )
+                {
+                    enableRedBarrier(false);
+                }
+            }
+        }
+    }
 }
 
 void ButtonsEnvironment::go(uint64_t _timer_interval, int _tick_limit)
@@ -91,6 +134,27 @@ void ButtonsEnvironment::go(uint64_t _timer_interval, int _tick_limit)
     env_thread.setTimerInterval(_timer_interval);
     env_thread.setTickLimit(_tick_limit);
     env_thread.startThread();
+}
+
+bool ButtonsEnvironment::isOpen(ofVec2f _loc)
+{
+    CellType_e cell_type = env_state[(int)_loc.x][(int)_loc.y];
+    bool rval = false;
+
+    switch( cell_type )
+    {
+        case EMPTY: // Fall through by design
+        case RED_BUTTON: // Fall through by design
+        case YELLOW_BUTTON: // Fall through by design
+        case GREEN_BUTTON: // Fall through by design
+        case GOAL:
+            rval = true;
+            break;
+        default:
+            rval = false;
+            break;
+    }
+    return rval;
 }
 
 void ButtonsEnvironment::render(ofFbo _fbo)

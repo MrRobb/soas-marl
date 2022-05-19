@@ -34,11 +34,6 @@ void ofApp::setup()
 //--------------------------------------------------------------
 void ofApp::update()
 {
-    // TODO: Move this to own thread. Shouldn't be dependent on framerate, etc.
-    // Compute
-    for (auto& env : envs) {
-        env.tick();
-    }
 }
 
 //--------------------------------------------------------------
@@ -78,7 +73,9 @@ void ofApp::keyPressed(int key){
     // G for Go
     //  Need to OR with 0x20 for lower-case
     if ((key == GLFW_KEY_G)||(key == (GLFW_KEY_G|0x20))) {
-        envs[0].go(500000000, 20);  // Go for 20 ticks at 0.5 sec/tick
+        //envs[0].go(500000000, 20);  // Go for 20 ticks at 0.5 sec/tick
+        envs[0].go(100000000, 200);  // Go for 20 ticks at 0.1 sec/tick
+        //envs[0].go(0, 200);  // Go for 20 ticks as fast as CPU will allow
     }
 }
 

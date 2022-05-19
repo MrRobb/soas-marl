@@ -101,8 +101,8 @@ private:
     CellType_e env_state[10][10] = {};  // Default to all empty cells. Fill in others in constructor.
 
     CellTypeInfo cell_info;
-    vector<ButtonsAgent> agents;
     ButtonsEnvironmentThread env_thread;
+    vector<ButtonsAgent> agents;
 
 public:
 	ButtonsEnvironment();
@@ -110,10 +110,16 @@ public:
 	void tick();    // Run environment and agents inside it for one cycle
 	void render(ofFbo _fbo);  // Renders graphical representation of environment to ofFbo object
 	void go(uint64_t _timer_interval, int _tick_limit);
+    bool isOpen(ofVec2f _loc);  // Check if agent can move into grid square
+	void updateEnvironment();    // Run automatic tasks like lowering barriers when buttons are pressed
 
 private:
     void enableGreenBarrier(bool _enable);
     void enableYellowBarrier(bool _enable);
     void enableRedBarrier(bool _enable);
     void drawAgent(ofFbo _fbo, ButtonsAgent &_agent);
+    ofVec2f yellow_button_loc;
+    ofVec2f red_button_loc;
+    ofVec2f green_button_loc;
+    ofVec2f goal_loc;
 };
