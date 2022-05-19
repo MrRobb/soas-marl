@@ -19,6 +19,16 @@
 
 typedef enum
 {
+    EMPTY_ENV = 0,
+    TEAM_ENV = 1,
+    AGENT1_ENV = 2,
+    AGENT2_ENV = 3,
+    AGENT3_ENV = 4,
+    NUM_ENV_CONFIGS
+} ButtonsEnvironmentConfig_e;
+
+typedef enum
+{
     EMPTY = 0,
     WALL  = 1,
     RED_BARRIER = 2,
@@ -103,9 +113,12 @@ private:
     CellTypeInfo cell_info;
     ButtonsEnvironmentThread env_thread;
     vector<ButtonsAgent> agents;
+    ButtonsEnvironmentConfig_e cfg;
 
 public:
 	ButtonsEnvironment();
+
+	void setConfig(ButtonsEnvironmentConfig_e _cfg);    // Set up agent config for environment
 
 	void tick();    // Run environment and agents inside it for one cycle
 	void render(ofFbo _fbo);  // Renders graphical representation of environment to ofFbo object

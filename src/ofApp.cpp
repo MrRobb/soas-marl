@@ -8,20 +8,27 @@
 // Local includes
 #include "soas_marl.h"
 
+ofApp::ofApp() :
+    envs()
+{
+}
 
 //--------------------------------------------------------------
 void ofApp::setup()
 {
     // Config - how many environments to draw (just one now, but keep flexible)
     int total_envs = NUM_ENV_ROW*NUM_ENV_COL;
-    assert(total_envs == 1); // Since we're only supporting one for now
+    //assert(total_envs == 1); // Since we're only supporting one for now
 
     // Initialize environment objects
     envs = vector<ButtonsEnvironment> (total_envs);
     env_locs = vector<ofVec2f> (total_envs);
     env_fbos = vector<ofFbo> (total_envs);
+    ButtonsEnvironmentConfig_e cfgs[4] = 
+        { AGENT1_ENV, AGENT2_ENV, AGENT3_ENV, TEAM_ENV };
     for (int i = 0; i < total_envs; i++)
     {
+        envs[i].setConfig(cfgs[i]);
         env_locs[i] = getEnvCoords(i, NUM_ENV_ROW, NUM_ENV_COL);
         env_fbos[i] = ofFbo();
         env_fbos[i].allocate(ENV_WIDTH, ENV_HEIGHT, GL_RGBA);
@@ -73,9 +80,12 @@ void ofApp::keyPressed(int key){
     // G for Go
     //  Need to OR with 0x20 for lower-case
     if ((key == GLFW_KEY_G)||(key == (GLFW_KEY_G|0x20))) {
-        //envs[0].go(500000000, 20);  // Go for 20 ticks at 0.5 sec/tick
-        envs[0].go(100000000, 200);  // Go for 20 ticks at 0.1 sec/tick
-        //envs[0].go(0, 200);  // Go for 20 ticks as fast as CPU will allow
+        for(int i=0; i<4; i++)
+        {
+            //envs[i].go(500000000, 20);  // Go for 20 ticks at 0.5 sec/tick
+            envs[i].go(100000000, 200);  // Go for 200 ticks at 0.1 sec/tick
+            //envs[i].go(0, 200);  // Go for 200 ticks as fast as CPU will allow
+        }
     }
 }
 

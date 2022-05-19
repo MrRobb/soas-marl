@@ -27,7 +27,6 @@ void ButtonsEnvironmentThread::threadedFunction()
             timer.waitNext();
         }
 
-        printf("Tick %d\n", ticks);  // TODO: Delete this eventually
         // This code calls the environment to update itself to the next state
         env.tick();
 
@@ -40,8 +39,10 @@ void ButtonsEnvironmentThread::threadedFunction()
     }
 }
 
+
 ButtonsEnvironment::ButtonsEnvironment() :
-    env_thread(*this)
+    env_thread(*this),
+    cfg(EMPTY_ENV)
 {
     // Set up map
     env_state[3][0] = env_state[3][1] = env_state[3][2] = env_state[3][3] = env_state[3][4] =
@@ -57,16 +58,39 @@ ButtonsEnvironment::ButtonsEnvironment() :
     env_state[9][6] = RED_BUTTON;
     env_state[8][8] = GOAL;
 
-    // Initialize agents - TODO: May also want environments with just a single agent for training
-    agents.reserve(3);
-    agents.emplace_back(ButtonsAgent(*this, ofVec2f(0,0)));
-    agents.emplace_back(ButtonsAgent(*this, ofVec2f(5,0)));
-    agents.emplace_back(ButtonsAgent(*this, ofVec2f(8,0)));
+    // Note: agent initialization moved to setConfig
 
     yellow_button_loc = ofVec2f(2,0);
     red_button_loc = ofVec2f(9,6);
     green_button_loc = ofVec2f(6,5);
     goal_loc = ofVec2f(8,8);
+}
+
+void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
+{
+    cfg = _cfg;
+    agents.clear();
+
+    switch(cfg)
+    {
+        case AGENT1_ENV:
+            agents.emplace_back(ButtonsAgent(*this, ofVec2f(0,0)));
+            break;
+        case AGENT2_ENV:
+            agents.emplace_back(ButtonsAgent(*this, ofVec2f(5,0)));
+            break;
+        case AGENT3_ENV:
+            agents.emplace_back(ButtonsAgent(*this, ofVec2f(8,0)));
+            break;
+        case TEAM_ENV:
+            agents.emplace_back(ButtonsAgent(*this, ofVec2f(0,0)));
+            agents.emplace_back(ButtonsAgent(*this, ofVec2f(5,0)));
+            agents.emplace_back(ButtonsAgent(*this, ofVec2f(8,0)));
+            break;
+        case EMPTY_ENV:
+        default:
+            break;
+    }
 }
 
 void ButtonsEnvironment::enableGreenBarrier(bool _enable)

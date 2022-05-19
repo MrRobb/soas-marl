@@ -20,8 +20,8 @@
 // This section deals with window setup parameters
 // Used to set up space in window for grid of environments
 // We'll start with 1x1
-#define NUM_ENV_ROW 1
-#define NUM_ENV_COL 1
+#define NUM_ENV_ROW 2
+#define NUM_ENV_COL 2
 
 #define WINDOW_WIDTH (NUM_ENV_COL*ENV_WIDTH_PLUS_MARGIN)
 #define WINDOW_HEIGHT (NUM_ENV_ROW*ENV_HEIGHT_PLUS_MARGIN)
