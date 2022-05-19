@@ -22,7 +22,6 @@ void ofApp::setup()
     env_fbos = vector<ofFbo> (total_envs);
     for (int i = 0; i < total_envs; i++)
     {
-        envs[i] = ButtonsEnvironment();
         env_locs[i] = getEnvCoords(i, NUM_ENV_ROW, NUM_ENV_COL);
         env_fbos[i] = ofFbo();
         env_fbos[i].allocate(ENV_WIDTH, ENV_HEIGHT, GL_RGBA);
@@ -74,6 +73,12 @@ void ofApp::keyPressed(int key){
     if (key == GLFW_KEY_9) {
     }
     if (key == GLFW_KEY_0) {
+    }
+
+    // G for Go
+    //  Need to OR with 0x20 for lower-case
+    if ((key == GLFW_KEY_G)||(key == (GLFW_KEY_G|0x20))) {
+        envs[0].go(500000000, 20);  // Go for 20 ticks at 0.5 sec/tick
     }
 }
 

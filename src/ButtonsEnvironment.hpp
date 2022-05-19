@@ -59,6 +59,42 @@ public:
     CellTypeInfo() {}
 };
 
+// Forward-declaration of ButtonsEnvironment (needed to allow ButtonsEnvironmentThread to have a reference to the env)
+class ButtonsEnvironment;
+
+class ButtonsEnvironmentThread : public ofThread
+{
+private:
+    // Settings like number of ticks, tick rate, etc.
+    ofTimer timer;
+    uint64_t timer_interval;  // Nanoseconds between ticks, 0 to disable
+    int ticks;                // Tick counter
+    int tick_limit;           // Stop running after this many ticks
+    ButtonsEnvironment &env;  // Reference to the environment
+
+public:
+    ButtonsEnvironmentThread(ButtonsEnvironment &_env) :
+        timer(),
+        timer_interval(0),  // Disable timer by default
+        ticks(0),
+        tick_limit(10000),
+        env(_env)
+    {
+    }
+
+    void setTickLimit(int _limit)
+    {
+        tick_limit = _limit;
+    }
+
+    void setTimerInterval(uint64_t _interval)
+    {
+        timer_interval = _interval;
+    }
+
+    void threadedFunction();
+};
+
 class ButtonsEnvironment {
 private:
     // TODO: Replace with thread-safe double-buffered object so we can draw and update in parallel.
@@ -66,12 +102,14 @@ private:
 
     CellTypeInfo cell_info;
     vector<ButtonsAgent> agents;
+    ButtonsEnvironmentThread env_thread;
 
 public:
 	ButtonsEnvironment();
 
 	void tick();    // Run environment and agents inside it for one cycle
 	void render(ofFbo _fbo);  // Renders graphical representation of environment to ofFbo object
+	void go(uint64_t _timer_interval, int _tick_limit);
 
 private:
     void enableGreenBarrier(bool _enable);

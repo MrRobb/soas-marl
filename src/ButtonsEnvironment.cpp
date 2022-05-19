@@ -7,7 +7,39 @@
 #include "ButtonsEnvironment.hpp"
 #include "soas_marl.h"
 
-ButtonsEnvironment::ButtonsEnvironment()
+void ButtonsEnvironmentThread::threadedFunction()
+{
+    // Initialize things before main loop
+    if(timer_interval > 0)
+    {
+        timer.setPeriodicEvent(timer_interval);
+        timer.reset();
+    }
+    ticks = 0;
+
+    while(isThreadRunning())
+    {
+        // Slow us down if the timer is enabled
+        if(timer_interval > 0)
+        {
+            timer.waitNext();
+        }
+
+        printf("Tick %d\n", ticks);  // TODO: Delete this eventually
+        // This code calls the environment to update itself to the next state
+        env.tick();
+
+        // Exit when we have run enough times
+        ticks++;
+        if(ticks >= tick_limit)
+        {
+            break;
+        }
+    }
+}
+
+ButtonsEnvironment::ButtonsEnvironment() :
+    env_thread(*this)
 {
     // Set up map
     env_state[3][0] = env_state[3][1] = env_state[3][2] = env_state[3][3] = env_state[3][4] =
@@ -23,7 +55,7 @@ ButtonsEnvironment::ButtonsEnvironment()
     env_state[9][6] = RED_BUTTON;
     env_state[8][8] = GOAL;
 
-    // Initialize agents
+    // Initialize agents - TODO: May also want environments with just a single agent for training
     agents = vector<ButtonsAgent>(3);
     agents[0].location = ofVec2f(0,0);
     agents[1].location = ofVec2f(5,0);
@@ -51,6 +83,14 @@ void ButtonsEnvironment::enableRedBarrier(bool _enable)
 void ButtonsEnvironment::tick()
 {
     // Run for one cycle
+    // TODO: Add code here to have each agent choose their next move and update the environment accordingly
+}
+
+void ButtonsEnvironment::go(uint64_t _timer_interval, int _tick_limit)
+{
+    env_thread.setTimerInterval(_timer_interval);
+    env_thread.setTickLimit(_tick_limit);
+    env_thread.startThread();
 }
 
 void ButtonsEnvironment::render(ofFbo _fbo)
