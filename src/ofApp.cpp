@@ -7,6 +7,7 @@
 
 // Local includes
 #include "soas_marl.h"
+#include "SparseRewardMachine.hpp"
 
 ofApp::ofApp() :
     envs()
@@ -87,6 +88,23 @@ void ofApp::keyPressed(int key){
             envs[i].go(10000000, 200);  // Go for 200 ticks at 100 Hz
             //envs[i].go(0, 200);  // Go for 200 ticks as fast as CPU will allow
         }
+    }
+
+    // T for Test
+    //  Need to OR with 0x20 for lower-case
+    if ((key == GLFW_KEY_T)||(key == (GLFW_KEY_T|0x20))) {
+        // Reward machine unit test
+        printf("Running unit test.\n");
+
+        printf("Buttons 1\n");
+        SparseRewardMachine rm1(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_1)));
+        printf("Buttons 2\n");
+        SparseRewardMachine rm2(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_2)));
+        printf("Buttons 3\n");
+        SparseRewardMachine rm3(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_3)));
+        printf("Team Buttons\n");
+        SparseRewardMachine rmteam(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_TEAM)));
+        printf("Done\n");
     }
 }
 

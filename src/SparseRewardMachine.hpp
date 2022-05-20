@@ -21,6 +21,15 @@ typedef int MachineState;
 typedef int Reward;
 typedef int Unknown;
 
+typedef enum
+{
+    RM_BUTTONS_1 = 0,
+    RM_BUTTONS_2 = 1,
+    RM_BUTTONS_3 = 2,
+    RM_BUTTONS_TEAM = 3
+} SparseRewardMachineFlavor_e;
+
+
 struct Transition {
     MachineState state_from;
     MachineState state_to;
@@ -155,7 +164,8 @@ public:
         return (this->delta_u.find(u) != this->delta_u.end()) &&
         (this->delta_u.at(u).find(e) != this->delta_u.at(u).end());
     }
-    
+
+    static char *getRmBuf(SparseRewardMachineFlavor_e _flavor);
 };
 
 #endif /* SparseRewardMachine_hpp */
