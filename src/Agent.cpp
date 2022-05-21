@@ -1,10 +1,10 @@
 //
-//  ButtonsAgent.cpp
-//  Implementation of buttons agent
+//  Agent.cpp
+//  Agent interface class
 //
 //
 
-#include "ButtonsAgent.hpp"
+#include "Agent.hpp"
 #include "ButtonsEnvironment.hpp"
 #include "soas_marl.h"
 
@@ -18,9 +18,14 @@ static ofVec2f ActionLut[NUM_ACTIONS] =
     { ofVec2f( 0, 0) }  // STAY
 };
 
-void ButtonsAgent::performAction(AgentAction_e _action)
+ofVec2f Agent::getActionVector(AgentAction_e _action)
 {
-    ofVec2f new_loc = location + ActionLut[_action];
+    return ActionLut[_action];
+}
+
+void Agent::performAction(AgentAction_e _action)
+{
+    ofVec2f new_loc = location + getActionVector(_action);
 
     // Make sure the action is legal overall (not moving outside of environment)
     if( (new_loc.x < 0) || (new_loc.x > 9) ) return;
@@ -28,7 +33,6 @@ void ButtonsAgent::performAction(AgentAction_e _action)
 
     // Make sure the action is legal in the current environment state
     if(!env.isOpen(new_loc)) return;
-
 
     // If we made it here, it's safe. Apply the action.
     location = new_loc;

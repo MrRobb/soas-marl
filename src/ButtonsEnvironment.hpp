@@ -7,7 +7,8 @@
 #include <stdio.h>  // For debugging
 
 #include "ofMain.h"
-#include "ButtonsAgent.hpp"
+#include "Agent.hpp"
+#include "ButtonsAgentRandomPolicy.hpp"
 
 #define WHITE  0xffffff
 #define BLACK  0x000000
@@ -112,7 +113,7 @@ private:
 
     CellTypeInfo cell_info;
     ButtonsEnvironmentThread env_thread;
-    vector<ButtonsAgent> agents;
+    vector<std::shared_ptr<Agent>> agents;
     ButtonsEnvironmentConfig_e cfg;
 
 public:
@@ -131,7 +132,7 @@ private:
     void enableGreenBarrier(bool _enable);
     void enableYellowBarrier(bool _enable);
     void enableRedBarrier(bool _enable);
-    void drawAgent(ofFbo _fbo, ButtonsAgent &_agent);
+    void drawAgent(ofFbo _fbo, Agent &_agent);
     ofVec2f yellow_button_loc;
     ofVec2f red_button_loc;
     ofVec2f green_button_loc;

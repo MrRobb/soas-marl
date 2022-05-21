@@ -9,6 +9,14 @@
 #include "ButtonsEnvironment.hpp"
 #include "soas_marl.h"
 
+typedef enum
+{
+    POLICY_RANDOM = 0,
+    POLICY_DQPRM = 1
+} Policy_e;
+
+Policy_e Policy = POLICY_RANDOM;
+
 void ButtonsEnvironmentThread::threadedFunction()
 {
     // Initialize things before main loop
@@ -71,25 +79,56 @@ void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
     cfg = _cfg;
     agents.clear();
 
-    switch(cfg)
+    if(Policy==POLICY_RANDOM)
     {
-        case AGENT1_ENV:
-            agents.emplace_back(ButtonsAgent(*this, ofVec2f(0,0)));
-            break;
-        case AGENT2_ENV:
-            agents.emplace_back(ButtonsAgent(*this, ofVec2f(5,0)));
-            break;
-        case AGENT3_ENV:
-            agents.emplace_back(ButtonsAgent(*this, ofVec2f(8,0)));
-            break;
-        case TEAM_ENV:
-            agents.emplace_back(ButtonsAgent(*this, ofVec2f(0,0)));
-            agents.emplace_back(ButtonsAgent(*this, ofVec2f(5,0)));
-            agents.emplace_back(ButtonsAgent(*this, ofVec2f(8,0)));
-            break;
-        case EMPTY_ENV:
-        default:
-            break;
+        switch(cfg)
+        {
+            case AGENT1_ENV:
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(0,0)));
+                break;
+            case AGENT2_ENV:
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(5,0)));
+                break;
+            case AGENT3_ENV:
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(8,0)));
+                break;
+            case TEAM_ENV:
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(0,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(5,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(8,0)));
+                break;
+            case EMPTY_ENV:
+            default:
+                break;
+        }
+    }
+    else if(Policy==POLICY_DQPRM)
+    {
+        // DELETE WHEN IMPLEMENTED
+        // Also, change agent type below to appropriate class (DqprmAgent?)
+        printf("Not implemented!");
+        assert(1==0);
+        // END DELETE WHEN IMPLEMENTED
+        switch(cfg)
+        {
+            case AGENT1_ENV:
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(0,0)));
+                break;
+            case AGENT2_ENV:
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(5,0)));
+                break;
+            case AGENT3_ENV:
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(8,0)));
+                break;
+            case TEAM_ENV:
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(0,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(5,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(8,0)));
+                break;
+            case EMPTY_ENV:
+            default:
+                break;
+        }
     }
 }
 
@@ -114,40 +153,57 @@ void ButtonsEnvironment::enableRedBarrier(bool _enable)
 void ButtonsEnvironment::tick()
 {
     // Run for one cycle
-    // TODO: Add code here to have each agent choose their next move and update the environment accordingly
 
-    // Example: make each agent pick a random action each tick
     for(uint32_t i=0; i<agents.size(); i++)
     {
-        AgentAction_e action = (AgentAction_e)(rand() % NUM_ACTIONS);
-        agents[i].performAction(action);
+        // Ask the agent for an action and then execute it
+        AgentAction_e action = agents[i]->getNextAction();
+        agents[i]->performAction(action);
     }
+
+    // Code will need to look like this, where agents conform to Agent interface:
+    // foreach agent:
+    //   agent.getNextAction()
+    //   agent.performAction()
+    //   updateEnvironment()  <-- Needs to return reward and list of events (put MDP label process inside here)
+    //   agent.updateAgent()  <-- Inputs: new state, action, reward, label, learning params
+    //   Here: Lines 67-79 of dqprm.py: evaluate and update Q function for all hypothetical states that the
+    //         reward machine could be in (other than terminal). Essentially, simulate the agent performing
+    //         an action where the reward machine is in each other state and update the Q function based on
+    //         each of these hypothetical actions.
+    //   
+    //
+    // Note: Not explicitly passing agent state around. It is a 2D ofVec2f object. Will need a function
+    //       to convert it like: 10*location.y+location.x to map to the 100-state Q Table
 
     // Then, after applying movement, check for events (like button presses)
     updateEnvironment();
 
-    // Then, as a last step, generate random sync events
+    // TODO: Add label encoder broadcast here (or in updateEnvironment?) based on environment state
+
+    // Then, as a last step, generate random sync events (TODO: Only in training)
     broadcastRandomEvent();
+
 }
 
 void ButtonsEnvironment::updateEnvironment()
 {
     for(uint32_t i=0; i<agents.size(); i++)
     {
-        if( agents[i].location == yellow_button_loc )
+        if( agents[i]->getLocation() == yellow_button_loc )
         {
             enableYellowBarrier(false);
         }
-        if( agents[i].location == green_button_loc )
+        if( agents[i]->getLocation() == green_button_loc )
         {
             enableGreenBarrier(false);
         }
-        if( agents[i].location == red_button_loc )
+        if( agents[i]->getLocation() == red_button_loc )
         {
             // Need to check for a second agent on it
             for(uint32_t j=i+1; j<agents.size(); j++)
             {
-                if( agents[j].location == red_button_loc )
+                if( agents[j]->getLocation() == red_button_loc )
                 {
                     enableRedBarrier(false);
                 }
@@ -240,19 +296,19 @@ void ButtonsEnvironment::render(ofFbo _fbo)
     }
 
     // Render foreground (agents)
-    for(auto& a : agents)
+    for(auto a : agents)
     {
-        drawAgent(_fbo, a);
+        drawAgent(_fbo, *a);
     }
 
     _fbo.end();
 
 }
 
-void ButtonsEnvironment::drawAgent(ofFbo _fbo, ButtonsAgent &_a)
+void ButtonsEnvironment::drawAgent(ofFbo _fbo, Agent &_a)
 {
-    float x = _a.location.x*SQUARE_LEN;
-    float y = _a.location.y*SQUARE_LEN;
+    float x = _a.getLocation().x*SQUARE_LEN;
+    float y = _a.getLocation().y*SQUARE_LEN;
 
     ofSetHexColor(PURPLE);
     ofDrawTriangle(x+12, y+2, x+2, y+22, x+22, y+22);
