@@ -171,7 +171,7 @@ void ButtonsEnvironment::tick()
     //         reward machine could be in (other than terminal). Essentially, simulate the agent performing
     //         an action where the reward machine is in each other state and update the Q function based on
     //         each of these hypothetical actions.
-    //   
+    //
     //
     // Note: Not explicitly passing agent state around. It is a 2D ofVec2f object. Will need a function
     //       to convert it like: 10*location.y+location.x to map to the 100-state Q Table

@@ -109,6 +109,8 @@ public:
 class ButtonsEnvironment {
 private:
     // TODO: Replace with thread-safe double-buffered object so we can draw and update in parallel.
+    //       The only impact of not doing this is possibly drawing a corrupt environment state from
+    //       time to time. No risk of environment corruption.
     CellType_e env_state[10][10] = {};  // Default to all empty cells. Fill in others in constructor.
 
     CellTypeInfo cell_info;
