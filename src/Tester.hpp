@@ -57,6 +57,10 @@ private:
 
 class Tester
 {
+public:
+    LearningParameters learning_params;
+    TestingParameters testing_params;
+
 private:
     uint32_t step_unit;
     uint32_t total_steps;
@@ -73,6 +77,8 @@ private:
 
 public:
     Tester() :
+        learning_params(),
+        testing_params(),
         step_unit(1000),
         total_steps(250*1000),
         min_steps(1),
@@ -92,5 +98,6 @@ public:
     uint32_t getCurrentStep() { return current_step; }
     bool stopLearning() { return total_steps <= current_step; }
     bool stopTask(uint32_t _step) { return min_steps <= _step; }
+
 
 };
