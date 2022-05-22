@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include <vector>
 #include "ButtonsEnvironment.hpp"
+#include "TrainTestThreadRandom.hpp"
 
 class ofApp : public ofBaseApp{
 
@@ -32,4 +33,8 @@ private:
     vector<ButtonsEnvironment> envs;  // Environment objects
     vector<ofVec2f> env_locs;         // Location where to draw each environment
     vector<ofFbo> env_fbos;           // Frame buffers holding the rendered environment
+
+    // Threads to run various processes
+    // DO NOT run these in parallel as they are designed to operate on the same objects.
+    TrainTestThreadRandom train_test_random_policy;
 };

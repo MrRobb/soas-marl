@@ -58,6 +58,20 @@ void ofApp::draw(){
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     if (key == GLFW_KEY_1) {
+        // Run Random Policy test
+
+        // Only need to use the first two environments for this
+        ButtonsEnvironmentConfig_e cfgs[4] = 
+            { TEAM_ENV, TEAM_ENV, EMPTY_ENV, EMPTY_ENV };
+        for (int i = 0; i < 4; i++)
+        {
+            envs[i].setConfig(cfgs[i]);
+        }
+        train_test_random_policy.registerTrainEnv(&envs[0]);
+        train_test_random_policy.registerTestEnv(&envs[1]);
+
+        train_test_random_policy.setTimerInterval(50000000); // 20 Hz
+        train_test_random_policy.startThread();
     }
     if (key == GLFW_KEY_2) {
     }
@@ -81,6 +95,9 @@ void ofApp::keyPressed(int key){
     // G for Go
     //  Need to OR with 0x20 for lower-case
     if ((key == GLFW_KEY_G)||(key == (GLFW_KEY_G|0x20))) {
+        // Note: This code to be deprecated soon. It makes more sense to have a single thread
+        //       control multiple environments than a single thread per-environment, the way
+        //       the train/test loop is set up.
         for(int i=0; i<4; i++)
         {
             //envs[i].go(500000000, 20);  // Go for 20 ticks at 0.5 sec/tick
