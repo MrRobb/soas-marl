@@ -41,5 +41,7 @@ public:
     void performAction(AgentAction_e _action);
     ofVec2f getLocation() { return location; }
 
+    int getAgentState();  // Helper function for Q-Learning state
+
     static ofVec2f getActionVector(AgentAction_e _action);
 };

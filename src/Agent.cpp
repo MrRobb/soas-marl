@@ -37,3 +37,10 @@ void Agent::performAction(AgentAction_e _action)
     // If we made it here, it's safe. Apply the action.
     location = new_loc;
 }
+
+int Agent::getAgentState()
+{
+    // Just a helper to convert the agent's position into a single number
+    // in order to encode the possible 100 agent locations
+    return (location.y*GRID_C)+location.x;
+}
