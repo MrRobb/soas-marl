@@ -87,11 +87,19 @@ public:
         current_step(0)
     {};
     
+    // Setters
     void setStepUnit(uint32_t _step_unit) { step_unit = _step_unit; }
     void setTotalSteps(uint32_t _total_steps) { total_steps = _total_steps; }
     void setMinSteps(uint32_t _min_steps) { min_steps = _min_steps; }
     void setNumTimes(uint32_t _num_times) { num_times = _num_times; }
     void setNumAgents(uint32_t _num_agents) { num_agents = _num_agents; }
+
+    // Getters - not all of them seem necessary
+    uint32_t getStepUnit() { return step_unit; }
+    uint32_t getTotalSteps() { return total_steps; }
+    uint32_t getMinSteps() { return min_steps; }
+    uint32_t getNumTimes() { return num_times; }
+    uint32_t getNumAgents() { return num_agents; }
 
     void restart() { current_step = 0; }
     void addStep() { current_step++; }
