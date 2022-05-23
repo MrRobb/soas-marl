@@ -117,9 +117,12 @@ private:
     ButtonsEnvironmentThread env_thread;
     vector<std::shared_ptr<Agent>> agents;
     ButtonsEnvironmentConfig_e cfg;
+    bool goal_reached;
 
 public:
 	ButtonsEnvironment();
+
+    void reset(bool _recreate_agents);
 
 	void setConfig(ButtonsEnvironmentConfig_e _cfg);    // Set up agent config for environment
 
@@ -129,14 +132,21 @@ public:
     bool isOpen(ofVec2f _loc);  // Check if agent can move into grid square
 	void updateEnvironment();    // Run automatic tasks like lowering barriers when buttons are pressed
 	void broadcastRandomEvent(); // TODO: Placeholder until I see how to integrate with Rob's code
+    bool solved();
+    vector<std::shared_ptr<Agent>> &getAgents() { return agents; }
+
 
 private:
     void enableGreenBarrier(bool _enable);
     void enableYellowBarrier(bool _enable);
     void enableRedBarrier(bool _enable);
     void drawAgent(ofFbo _fbo, Agent &_agent);
+    void resetAgentPositions();
     ofVec2f yellow_button_loc;
     ofVec2f red_button_loc;
     ofVec2f green_button_loc;
     ofVec2f goal_loc;
+    ofVec2f agent1_init_loc;
+    ofVec2f agent2_init_loc;
+    ofVec2f agent3_init_loc;
 };

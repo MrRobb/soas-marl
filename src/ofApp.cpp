@@ -70,7 +70,9 @@ void ofApp::keyPressed(int key){
         train_test_random_policy.registerTrainEnv(&envs[0]);
         train_test_random_policy.registerTestEnv(&envs[1]);
 
-        train_test_random_policy.setTimerInterval(50000000); // 20 Hz
+        train_test_random_policy.setTimerInterval(10000000); // 100 Hz
+        //train_test_random_policy.setTimerInterval(1000000); // 1000 Hz
+        //train_test_random_policy.setTimerInterval(0); // No limit
         train_test_random_policy.startThread();
     }
     if (key == GLFW_KEY_2) {

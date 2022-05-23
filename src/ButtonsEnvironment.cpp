@@ -50,7 +50,8 @@ void ButtonsEnvironmentThread::threadedFunction()
 
 ButtonsEnvironment::ButtonsEnvironment() :
     env_thread(*this),
-    cfg(EMPTY_ENV)
+    cfg(EMPTY_ENV),
+    goal_reached(false)
 {
     // Set up map
     env_state[3][0] = env_state[3][1] = env_state[3][2] = env_state[3][3] = env_state[3][4] =
@@ -72,6 +73,54 @@ ButtonsEnvironment::ButtonsEnvironment() :
     red_button_loc = ofVec2f(9,6);
     green_button_loc = ofVec2f(6,5);
     goal_loc = ofVec2f(8,8);
+    agent1_init_loc = ofVec2f(0,0);
+    agent2_init_loc = ofVec2f(5,0);
+    agent3_init_loc = ofVec2f(8,0);
+}
+
+void ButtonsEnvironment::reset(bool _recreate_agents)
+{
+    if(_recreate_agents)
+    {
+        // Create new agents in initial positions (erases learning)
+        setConfig(cfg);
+    }
+    else
+    {
+        // Move agents to initial positions without erasing their memory
+        resetAgentPositions();
+    }
+
+    enableGreenBarrier(true);
+    enableYellowBarrier(true);
+    enableRedBarrier(true);
+
+    goal_reached = false;
+
+    // TODO: May need to reset reward machine here
+}
+
+void ButtonsEnvironment::resetAgentPositions()
+{
+    switch(cfg)
+    {
+        case AGENT1_ENV:
+            agents[0]->setLocation(agent1_init_loc);
+            break;
+        case AGENT2_ENV:
+            agents[0]->setLocation(agent2_init_loc);
+            break;
+        case AGENT3_ENV:
+            agents[0]->setLocation(agent3_init_loc);
+            break;
+        case TEAM_ENV:
+            agents[0]->setLocation(agent1_init_loc);
+            agents[1]->setLocation(agent2_init_loc);
+            agents[2]->setLocation(agent3_init_loc);
+            break;
+        default:
+            break;
+    }
 }
 
 void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
@@ -84,18 +133,18 @@ void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
         switch(cfg)
         {
             case AGENT1_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(0,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent1_init_loc));
                 break;
             case AGENT2_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(5,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent2_init_loc));
                 break;
             case AGENT3_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(8,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent3_init_loc));
                 break;
             case TEAM_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(0,0)));
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(5,0)));
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(8,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent1_init_loc));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent2_init_loc));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent3_init_loc));
                 break;
             case EMPTY_ENV:
             default:
@@ -112,18 +161,18 @@ void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
         switch(cfg)
         {
             case AGENT1_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(0,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent1_init_loc));
                 break;
             case AGENT2_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(5,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent2_init_loc));
                 break;
             case AGENT3_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(8,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent3_init_loc));
                 break;
             case TEAM_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(0,0)));
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(5,0)));
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, ofVec2f(8,0)));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent1_init_loc));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent2_init_loc));
+                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent3_init_loc));
                 break;
             case EMPTY_ENV:
             default:
@@ -208,6 +257,10 @@ void ButtonsEnvironment::updateEnvironment()
                     enableRedBarrier(false);
                 }
             }
+        }
+        if( agents[i]->getLocation() == goal_loc )
+        {
+            goal_reached = true;
         }
     }
 }
@@ -313,4 +366,25 @@ void ButtonsEnvironment::drawAgent(ofFbo _fbo, Agent &_a)
     ofSetHexColor(PURPLE);
     ofDrawTriangle(x+12, y+2, x+2, y+22, x+22, y+22);
 
+}
+
+bool ButtonsEnvironment::solved()
+{
+    bool rv = false;
+
+    switch(cfg)
+    {
+        case TEAM_ENV:
+            rv = goal_reached ? true : false;
+            break;
+
+        case AGENT1_ENV:
+        case AGENT2_ENV:
+        case AGENT3_ENV:
+        default:
+            printf("ButtonsEnvironment::solved() not implemented for DQPRM!");
+            break;
+    }
+
+    return rv;
 }

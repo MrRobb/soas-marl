@@ -26,6 +26,12 @@ public:
     void setInitialEpsilon(float _initial_epsilon) { initial_epsilon = _initial_epsilon; };
     void setMaxTsPerTask(float _max_timesteps_per_task) { max_timesteps_per_task = _max_timesteps_per_task; };
 
+    float getGamma() { return gamma; }
+    float getAlpha() { return alpha; }
+    float getT() { return T; }
+    float getInitialEpsilon() { return initial_epsilon; }
+    uint32_t getMaxTsPerTask() {return max_timesteps_per_task; }
+
 private:
     float gamma;
     float alpha;
@@ -47,6 +53,10 @@ public:
     void setTest(bool _test) { test = _test; }
     void setTestFreq(uint32_t _test_freq) { test_freq = _test_freq; }
     void setNumSteps(uint32_t _num_steps) { num_steps = _num_steps; }
+
+    bool getTest() { return test; }
+    uint32_t getTestFreq() { return test_freq; }
+    uint32_t getNumSteps() { return num_steps; }
 
 private:
     bool test;

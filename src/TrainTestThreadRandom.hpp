@@ -8,6 +8,7 @@
 #include <stdio.h>  // For debugging
 
 #include "ofMain.h"
+#include "Tester.hpp"
 
 // Forward-declaration of ButtonsEnvironment
 class ButtonsEnvironment;
@@ -20,8 +21,9 @@ private:
     uint64_t timer_interval;        // Nanoseconds between ticks, 0 to disable
     ButtonsEnvironment *p_train_env;  // Reference to train environment
     ButtonsEnvironment *p_test_env;   // Reference to test environment
-    uint32_t counter;
-    uint32_t limit;
+    Tester   tester;
+    uint32_t step;
+    float    epsilon;
 
 public:
     TrainTestThreadRandom() :
@@ -29,8 +31,9 @@ public:
         timer_interval(0),  // Disable timer by default
         p_train_env(nullptr),
         p_test_env(nullptr),
-        counter(0),
-        limit(100)
+        tester(),
+        step(0),
+        epsilon(0)
     {
     }
 
@@ -42,13 +45,8 @@ public:
         timer_interval = _interval;
     }
 
-    // Just the boilerplate code to limit the tick rate if desired. The "real" code should
-    // go in trainTestLoop(). There are also hooks for trainTestInit() and trainTestPost()
-    // for setup/cleanup, respectively. Add member variables to this class to control
-    // state between iterations.
     void threadedFunction()
     {
-        bool done = false;
         printf("Starting...\n");
 
         if( (nullptr == p_train_env) || (nullptr == p_test_env) )
@@ -59,32 +57,20 @@ public:
 
         trainTestInit();
 
-        // Initialize things before main loop
-        if(timer_interval > 0)
+        trainTestLoop();  // Start checking isThreadRunning inside this function for early exit
+
+        if(isThreadRunning())
         {
-            timer.setPeriodicEvent(timer_interval);
-            timer.reset();
+            trainTestPost();
         }
-
-        while(isThreadRunning())
-        {
-            // Slow us down if the timer is enabled
-            if(timer_interval > 0)
-            {
-                timer.waitNext();
-            }
-
-            // Run trainTestLoop until done
-            done = trainTestLoop();
-            if( done ) break;
-        }
-
-        trainTestPost();
     }
 
-    // Fill in these functions to 
+    // Fill in these functions to run training loop
     void trainTestInit();
-    bool trainTestLoop();
+    void trainTestLoop();
     void trainTestPost();
+
+    void runEpisode();
+    void runTest();
 
 };

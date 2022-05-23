@@ -40,6 +40,7 @@ public:
 
     void performAction(AgentAction_e _action);
     ofVec2f getLocation() { return location; }
+    void setLocation(ofVec2f _loc) { location = _loc; }  // Should only be called to initialize environment
 
     int getAgentState();  // Helper function for Q-Learning state
 
