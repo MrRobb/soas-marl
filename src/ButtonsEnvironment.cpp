@@ -382,7 +382,10 @@ bool ButtonsEnvironment::solved()
         case AGENT2_ENV:
         case AGENT3_ENV:
         default:
-            printf("ButtonsEnvironment::solved() not implemented for DQPRM!");
+            printf("ButtonsEnvironment::solved() not implemented for DQPRM!\n");
+            // Probably just check if RM is in terminal state. Alternatively, could check
+            // if agent has completed its task (which I think is the same thing).
+            rv = goal_reached ? true : false; // Remove this when implemented
             break;
     }
 

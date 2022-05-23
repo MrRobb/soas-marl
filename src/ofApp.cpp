@@ -76,6 +76,25 @@ void ofApp::keyPressed(int key){
         train_test_random_policy.startThread();
     }
     if (key == GLFW_KEY_2) {
+        // Run DQPRM test
+
+        // Need all four environments for this. First 3 are single-agent ones (training) and last one is
+        // team (for test)
+        ButtonsEnvironmentConfig_e cfgs[4] = 
+            { AGENT1_ENV, AGENT2_ENV, AGENT3_ENV, TEAM_ENV };
+        for (int i = 0; i < 4; i++)
+        {
+            envs[i].setConfig(cfgs[i]);
+        }
+        train_test_dqprm.registerTrainEnv1(&envs[0]);
+        train_test_dqprm.registerTrainEnv2(&envs[1]);
+        train_test_dqprm.registerTrainEnv3(&envs[2]);
+        train_test_dqprm.registerTestEnv(&envs[3]);
+
+        train_test_dqprm.setTimerInterval(10000000); // 100 Hz
+        //train_test_dqprm.setTimerInterval(1000000); // 1000 Hz
+        //train_test_dqprm.setTimerInterval(0); // No limit
+        train_test_dqprm.startThread();
     }
     if (key == GLFW_KEY_3) {
     }

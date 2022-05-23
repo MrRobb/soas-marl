@@ -4,6 +4,7 @@
 #include <vector>
 #include "ButtonsEnvironment.hpp"
 #include "TrainTestThreadRandom.hpp"
+#include "TrainTestThreadDqprm.hpp"
 
 class ofApp : public ofBaseApp{
 
@@ -37,4 +38,5 @@ private:
     // Threads to run various processes
     // DO NOT run these in parallel as they are designed to operate on the same objects.
     TrainTestThreadRandom train_test_random_policy;
+    TrainTestThreadDqprm  train_test_dqprm;
 };
