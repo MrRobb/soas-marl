@@ -44,7 +44,8 @@ private:
     
 public:
     
-    QAgent(std::stringstream& reward_machine, MachineState s_i, unsigned int num_states, std::vector<Action> actions, int agent_id) : rm {SparseRewardMachine(reward_machine)} {
+    QAgent(SparseRewardMachineFlavor_e reward_machine, MachineState s_i, unsigned int num_states, std::vector<Action> actions, int agent_id) :
+        rm (std::stringstream(SparseRewardMachine::getRmBuf(reward_machine))) {
         this->agent_id = agent_id;
         this->s_i = s_i;
         this->s = s_i;
