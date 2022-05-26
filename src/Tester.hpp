@@ -20,23 +20,23 @@ public:
         max_timesteps_per_task(1000)
     {}
 
-    void setGamma(float _gamma) { gamma = _gamma; };
-    void setAlpha(float _alpha) { alpha = _alpha; };
-    void setT(float _T) { T = _T; };
-    void setInitialEpsilon(float _initial_epsilon) { initial_epsilon = _initial_epsilon; };
-    void setMaxTsPerTask(float _max_timesteps_per_task) { max_timesteps_per_task = _max_timesteps_per_task; };
+    void setGamma(double _gamma) { gamma = _gamma; };
+    void setAlpha(double _alpha) { alpha = _alpha; };
+    void setT(double _T) { T = _T; };
+    void setInitialEpsilon(double _initial_epsilon) { initial_epsilon = _initial_epsilon; };
+    void setMaxTsPerTask(double _max_timesteps_per_task) { max_timesteps_per_task = _max_timesteps_per_task; };
 
-    float getGamma() { return gamma; }
-    float getAlpha() { return alpha; }
-    float getT() { return T; }
-    float getInitialEpsilon() { return initial_epsilon; }
+    double getGamma() { return gamma; }
+    double getAlpha() { return alpha; }
+    double getT() { return T; }
+    double getInitialEpsilon() { return initial_epsilon; }
     uint32_t getMaxTsPerTask() {return max_timesteps_per_task; }
 
 private:
-    float gamma;
-    float alpha;
-    float T;
-    float initial_epsilon;
+    double gamma;
+    double alpha;
+    double T;
+    double initial_epsilon;
     uint32_t max_timesteps_per_task;
 };
 

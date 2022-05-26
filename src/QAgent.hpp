@@ -3,8 +3,7 @@
 //
 //
 
-#ifndef QAgent_hpp
-#define QAgent_hpp
+#pragma once
 
 #include <stdio.h>
 #include <vector>
@@ -16,22 +15,16 @@
 #include <xtensor/xbuilder.hpp>
 #include <xtensor/xview.hpp>
 #include <random>
+#include "Agent.hpp"
+#include "Tester.hpp"
 
-
-typedef int Action;
-
-struct LearningParams {
-    double T;
-    double alpha;
-    double gamma;
-};
 
 class QAgent {
 private:
     int agent_id;
     int s_i; // index of initial state
     MachineState s;
-    std::vector<Action> actions;
+    std::vector<AgentAction_e> actions;
     unsigned int num_states;
     
     SparseRewardMachine rm;
@@ -44,7 +37,7 @@ private:
     
 public:
     
-    QAgent(SparseRewardMachineFlavor_e reward_machine, MachineState s_i, unsigned int num_states, std::vector<Action> actions, int agent_id) :
+    QAgent(SparseRewardMachineFlavor_e reward_machine, MachineState s_i, unsigned int num_states, std::vector<AgentAction_e> actions, int agent_id) :
         rm (std::stringstream(SparseRewardMachine::getRmBuf(reward_machine))) {
         this->agent_id = agent_id;
         this->s_i = s_i;
@@ -76,9 +69,9 @@ public:
         }
     }
     
-    std::pair<MachineState, Action> get_next_action(const double epsilon, const LearningParams& learning_params) {
-        auto T = learning_params.T;
-        Action a_selected = NULL;
+    std::pair<MachineState, AgentAction_e> get_next_action(const double epsilon, LearningParameters& learning_params) {
+        double T = learning_params.getT();
+        AgentAction_e a_selected = STAY;
         
         if ((double(rand()) / double(RAND_MAX)) < epsilon) {
             // Explore
@@ -105,9 +98,9 @@ public:
             }
             
             double randn = double(rand()) / double(RAND_MAX);
-            for (const Action& a : this->actions) {
-                if (randn >= pr_select[a] && randn <= pr_select[a+1]) {
-                    a_selected = a;
+            for (size_t i = 0; i < this->actions.size(); i++) {
+                if (randn >= pr_select[i] && randn <= pr_select[i+1]) {
+                    a_selected = (AgentAction_e)i;
                     break;
                 }
             }
@@ -116,7 +109,7 @@ public:
         return std::make_pair(this->s, a_selected);
     }
     
-    void update_agent(const MachineState& s_new, const Action& a, const Reward& reward, const std::vector<Event>& label, const LearningParams& learning_params, bool update_q_function = true) {
+    void update_agent(const MachineState& s_new, const AgentAction_e& a, const Reward& reward, const std::vector<Event>& label, LearningParameters& learning_params, bool update_q_function = true) {
         MachineState u_start = this->u;
         
         for (const Event& event : label) {
@@ -137,13 +130,11 @@ public:
         }
     }
     
-    void update_q_function(const MachineState& s, const MachineState& s_new, const MachineState& u, const MachineState& u_new, const Action& a, const Reward& reward, const LearningParams& learning_params) {
-        double alpha = learning_params.alpha;
-        double gamma = learning_params.gamma;
+    void update_q_function(const MachineState& s, const MachineState& s_new, const MachineState& u, const MachineState& u_new, const AgentAction_e& a, const Reward& reward, LearningParameters& learning_params) {
+        double alpha = learning_params.getAlpha();
+        double gamma = learning_params.getGamma();
         
         double bellman = xt::amax(xt::view(this->q, s_new, u_new, xt::all()))[0];
         this->q(s, u, a) = (1.0 - alpha) * this->q(s, u, a) + alpha * (reward + gamma * bellman);
     }
 };
-
-#endif /* QAgent_hpp */
