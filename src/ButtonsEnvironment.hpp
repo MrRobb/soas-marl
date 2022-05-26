@@ -9,6 +9,7 @@
 #include "ofMain.h"
 #include "Agent.hpp"
 #include "ButtonsAgentRandomPolicy.hpp"
+#include "SparseRewardMachine.hpp"
 
 #define WHITE  0xffffff
 #define BLACK  0x000000
@@ -131,9 +132,11 @@ public:
 	void go(uint64_t _timer_interval, int _tick_limit);
     bool isOpen(ofVec2f _loc);  // Check if agent can move into grid square
 	void updateEnvironment();    // Run automatic tasks like lowering barriers when buttons are pressed
+	void environmentStep(int _agent_idx, AgentAction_e _action, int &_reward, std::vector<Event> &_labels, int &_new_state);   // Duplicates some other code, but need to split for Q-Learning
 	void broadcastRandomEvent(); // TODO: Placeholder until I see how to integrate with Rob's code
     bool solved();
     vector<std::shared_ptr<Agent>> &getAgents() { return agents; }
+    void getMDPLabel(MachineState _u, std::vector<Event> &_labels);
 
 
 private:
@@ -149,4 +152,6 @@ private:
     ofVec2f agent1_init_loc;
     ofVec2f agent2_init_loc;
     ofVec2f agent3_init_loc;
+    std::shared_ptr<SparseRewardMachine> reward_machine;
+    MachineState u;
 };

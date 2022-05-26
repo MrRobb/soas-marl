@@ -73,7 +73,7 @@ public:
     void trainTestLoop();
     void trainTestPost();
 
-    void runEpisode();
+    void runEpisode(double _epsilon);
     void runTest();
 
 };

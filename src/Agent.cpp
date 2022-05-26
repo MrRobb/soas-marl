@@ -38,6 +38,23 @@ void Agent::performAction(AgentAction_e _action)
     location = new_loc;
 }
 
+int Agent::simulateAction(AgentAction_e _action)
+{
+    int rv_state = getAgentState();
+    ofVec2f new_loc = location + getActionVector(_action);
+
+    // Make sure the action is legal overall (not moving outside of environment)
+    if( (new_loc.x < 0) || (new_loc.x > 9) ) return rv_state;
+    if( (new_loc.y < 0) || (new_loc.y > 9) ) return rv_state;
+
+    // Make sure the action is legal in the current environment state
+    if(!env.isOpen(new_loc)) return rv_state;
+
+    // If we made it here, it's safe.
+    rv_state = (new_loc.y*GRID_C)+new_loc.x;
+    return rv_state;
+}
+
 int Agent::getAgentState()
 {
     // Just a helper to convert the agent's position into a single number

@@ -36,9 +36,12 @@ public:
     
     // These are the interface functions to override
 	virtual AgentAction_e getNextAction() { return STAY; }
+    virtual void initialize_reward_machine() { }
+    virtual bool getTaskComplete() { return false; }  // Only used for DQPRM agents
     // End interface functions
 
     void performAction(AgentAction_e _action);
+    int simulateAction(AgentAction_e _action);
     ofVec2f getLocation() { return location; }
     void setLocation(ofVec2f _loc) { location = _loc; }  // Should only be called to initialize environment
 

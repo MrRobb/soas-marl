@@ -8,6 +8,7 @@
 
 #include "ButtonsEnvironment.hpp"
 #include "soas_marl.h"
+#include "QAgent.hpp"
 
 typedef enum
 {
@@ -51,7 +52,9 @@ void ButtonsEnvironmentThread::threadedFunction()
 ButtonsEnvironment::ButtonsEnvironment() :
     env_thread(*this),
     cfg(EMPTY_ENV),
-    goal_reached(false)
+    goal_reached(false),
+    reward_machine(nullptr),
+    u(0)
 {
     // Set up map
     env_state[3][0] = env_state[3][1] = env_state[3][2] = env_state[3][3] = env_state[3][4] =
@@ -89,6 +92,11 @@ void ButtonsEnvironment::reset(bool _recreate_agents)
     {
         // Move agents to initial positions without erasing their memory
         resetAgentPositions();
+    }
+
+    for(uint32_t i=0; i<agents.size(); i++)
+    {
+        agents[i]->initialize_reward_machine();
     }
 
     enableGreenBarrier(true);
@@ -134,17 +142,21 @@ void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
         {
             case AGENT1_ENV:
                 agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent1_init_loc));
+                reward_machine = std::make_shared<SparseRewardMachine>(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_1)));
                 break;
             case AGENT2_ENV:
                 agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent2_init_loc));
+                reward_machine = std::make_shared<SparseRewardMachine>(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_2)));
                 break;
             case AGENT3_ENV:
                 agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent3_init_loc));
+                reward_machine = std::make_shared<SparseRewardMachine>(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_3)));
                 break;
             case TEAM_ENV:
                 agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent1_init_loc));
                 agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent2_init_loc));
                 agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent3_init_loc));
+                reward_machine = std::make_shared<SparseRewardMachine>(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_TEAM)));
                 break;
             case EMPTY_ENV:
             default:
@@ -161,18 +173,22 @@ void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
         switch(cfg)
         {
             case AGENT1_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent1_init_loc));
+                agents.emplace_back(std::make_shared<QAgent>(RM_BUTTONS_1, 100, 1, *this, agent1_init_loc));
+                reward_machine = std::make_shared<SparseRewardMachine>(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_1)));
                 break;
             case AGENT2_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent2_init_loc));
+                agents.emplace_back(std::make_shared<QAgent>(RM_BUTTONS_2, 100, 2, *this, agent2_init_loc));
+                reward_machine = std::make_shared<SparseRewardMachine>(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_2)));
                 break;
             case AGENT3_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent3_init_loc));
+                agents.emplace_back(std::make_shared<QAgent>(RM_BUTTONS_3, 100, 3, *this, agent3_init_loc));
+                reward_machine = std::make_shared<SparseRewardMachine>(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_3)));
                 break;
             case TEAM_ENV:
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent1_init_loc));
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent2_init_loc));
-                agents.emplace_back(std::make_shared<ButtonsAgentRandomPolicy>(*this, agent3_init_loc));
+                agents.emplace_back(std::make_shared<QAgent>(RM_BUTTONS_1, 100, 1, *this, agent1_init_loc));
+                agents.emplace_back(std::make_shared<QAgent>(RM_BUTTONS_2, 100, 2, *this, agent2_init_loc));
+                agents.emplace_back(std::make_shared<QAgent>(RM_BUTTONS_3, 100, 3, *this, agent3_init_loc));
+                reward_machine = std::make_shared<SparseRewardMachine>(std::stringstream(SparseRewardMachine::getRmBuf(RM_BUTTONS_TEAM)));
                 break;
             case EMPTY_ENV:
             default:
@@ -263,6 +279,27 @@ void ButtonsEnvironment::updateEnvironment()
             goal_reached = true;
         }
     }
+}
+
+void ButtonsEnvironment::environmentStep(int _agent_idx, AgentAction_e _action, int &_reward, std::vector<Event> &_labels, int &_new_state)
+{
+    _reward=0;
+    _labels.clear();
+    _new_state = agents[_agent_idx]->getAgentState();
+
+    // TODO: Change action if slip (probably 0.98 no slip) - no reason to save last_action since it isn't used
+    AgentAction_e action = _action;
+    
+    // simulate action. need to keep agent in same state and update during Q learning
+    // update_agent will convert state to new location
+    _new_state = agents[_agent_idx]->simulateAction(action);
+
+    // get MDP label
+    getMDPLabel(_new_state, _labels);
+
+
+    // get reward
+
 }
 
 void ButtonsEnvironment::broadcastRandomEvent()
@@ -390,4 +427,25 @@ bool ButtonsEnvironment::solved()
     }
 
     return rv;
+}
+
+void ButtonsEnvironment::getMDPLabel(MachineState _u, std::vector<Event> &_labels)
+{
+    switch(cfg)
+    {
+        case AGENT1_ENV:
+            // Like buttons_env:get_mdp_label, where agent_id==1
+            break;
+        case AGENT2_ENV:
+            // Like buttons_env:get_mdp_label, where agent_id==2
+            break;
+        case AGENT3_ENV:
+            // Like buttons_env:get_mdp_label, where agent_id==3
+            break;
+        case TEAM_ENV:
+            // Like multi_agent_buttons_env:get_mdp_label
+            break;
+        default:
+            break;
+    }
 }

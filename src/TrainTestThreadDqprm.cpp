@@ -8,6 +8,7 @@
 
 #include "TrainTestThreadDqprm.hpp"
 #include "ButtonsEnvironment.hpp"
+#include "QAgent.hpp"
 #include "soas_marl.h"
 
 void TrainTestThreadDqprm::trainTestInit()
@@ -41,7 +42,7 @@ void TrainTestThreadDqprm::trainTestLoop()
         while( !tester.stopLearning() )
         {
             // Run Learning/Test episodes
-            runEpisode();
+            runEpisode(epsilon);
 
             if(!isThreadRunning()) break;
         }
@@ -52,7 +53,7 @@ void TrainTestThreadDqprm::trainTestLoop()
     }
 }
 
-void TrainTestThreadDqprm::runEpisode()
+void TrainTestThreadDqprm::runEpisode(double _epsilon)
 {
     printf("Start episode\n");
     // Reset environment (but not agents)
@@ -75,14 +76,29 @@ void TrainTestThreadDqprm::runEpisode()
             // TODO: solved() needs to be updated based on the RM
             if(!p_train_env[j]->solved())
             {
-                // Note: In DQPRM, need to add Q-Learning updates and reward machines
-
                 // First, deal with agent movement
                 vector<shared_ptr<Agent>> &agent_list = p_train_env[j]->getAgents();
-                for(uint32_t j=0; j<agent_list.size(); j++)
+                for(uint32_t k=0; k<agent_list.size(); k++)
                 {
-                    AgentAction_e action = agent_list[j]->getNextAction();
-                    agent_list[j]->performAction(action);
+                    Agent *agent = agent_list[k].get();
+                    QAgent *qagent = dynamic_cast<QAgent *>(agent);
+
+                    if(!qagent->getTaskComplete())
+                    {
+                        int orig_state = qagent->getAgentState();
+                        AgentAction_e action = qagent->get_next_action(_epsilon, tester.learning_params);
+                        
+                        // outputs: reward, labels, new_state
+                        int reward=0;
+                        std::vector<Event> labels;
+                        int new_state=0;
+                        p_train_env[j]->environmentStep(k, action, reward, labels, new_state);
+
+
+
+
+                        agent_list[k]->performAction(action);
+                    }
                 }
 
                 // Next, update environment after agents move

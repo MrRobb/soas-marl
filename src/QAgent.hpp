@@ -10,19 +10,27 @@
 #include <string>
 #include <unordered_set>
 #include <sstream>
-#include "SparseRewardMachine.hpp"
-#include <xtensor/xarray.hpp>
-#include <xtensor/xbuilder.hpp>
-#include <xtensor/xview.hpp>
 #include <random>
+#include "SparseRewardMachine.hpp"
 #include "Agent.hpp"
 #include "Tester.hpp"
 
+// HACK! xtensor calls some variables PI (very bad). Since openFrameworks #defines PI, the variable name
+// gets changed to a number, which is nonsense. This is horrible, but there's no time to fix it right, so
+// it is what it is.
+#ifdef PI
+#undef PI
+#endif
+#include <xtensor/xarray.hpp>
+#include <xtensor/xbuilder.hpp>
+#include <xtensor/xview.hpp>
+#define PI 3.14159265358979323846
 
-class QAgent : Agent {
+
+class QAgent : public Agent {
 private:
     int agent_id;
-    std::vector<AgentAction_e> actions;
+    std::vector<AgentAction_e> actions {MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, STAY};
     unsigned int num_states;
     
     SparseRewardMachine rm;
@@ -35,11 +43,10 @@ private:
     
 public:
     
-    QAgent(SparseRewardMachineFlavor_e reward_machine, unsigned int num_states, std::vector<AgentAction_e> actions, int agent_id, ButtonsEnvironment &_env) :
+    QAgent(SparseRewardMachineFlavor_e reward_machine, unsigned int num_states, int agent_id, ButtonsEnvironment &_env) :
         Agent(_env),
         rm (std::stringstream(SparseRewardMachine::getRmBuf(reward_machine))) {
         this->agent_id = agent_id;
-        this->actions = actions;
         this->num_states = num_states;
         this->u = this->rm.get_initial_state();
         this->local_event_set = this->rm.get_events();
@@ -47,7 +54,7 @@ public:
 
     }
 
-    QAgent(SparseRewardMachineFlavor_e reward_machine, unsigned int num_states, std::vector<AgentAction_e> actions, int agent_id, ButtonsEnvironment &_env, ofVec2f _init_loc) :
+    QAgent(SparseRewardMachineFlavor_e reward_machine, unsigned int num_states, int agent_id, ButtonsEnvironment &_env, ofVec2f _init_loc) :
         Agent(_env, _init_loc),
         rm (std::stringstream(SparseRewardMachine::getRmBuf(reward_machine))) {
         this->agent_id = agent_id;
@@ -63,10 +70,12 @@ public:
         // Environment should reset position. Can probably delete this
     }
     
-    void initialize_reward_machine() {
+    virtual void initialize_reward_machine() {
         this->u = this->rm.get_initial_state();
         this->is_task_complete = false;
     }
+
+    virtual bool getTaskComplete() { return is_task_complete; }
     
     bool is_local_event_available(const std::vector<Event>& label) {
         if (label.size() > 0) {
@@ -118,7 +127,7 @@ public:
         return a_selected;
     }
     
-    void update_agent(const MachineState& s_new, const AgentAction_e& a, const Reward& reward, const std::vector<Event>& label, LearningParameters& learning_params, bool update_q_function = true) {
+    void update_agent(const MachineState& s_new, const AgentAction_e& a, const Reward& reward, std::vector<Event>& label, LearningParameters& learning_params, bool update_q_function = true) {
         MachineState u_start = this->u;
         
         for (const Event& event : label) {
@@ -136,6 +145,8 @@ public:
         //       env.get_next_state does slip plus validity check
         //       env.environment_step does get_next_state, MDP label, rm: get_next_state and reward
         //this->s = s_new;
+        // new_loc.x = s_new%GRID_C;
+        // new_loc.y = s_new/GRID_C;
         
         if (this->rm.is_terminal_state(this->u)) {
             this->is_task_complete = true;
