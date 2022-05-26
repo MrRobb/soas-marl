@@ -78,6 +78,9 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
             {
                 // First, deal with agent movement
                 vector<shared_ptr<Agent>> &agent_list = p_train_env[j]->getAgents();
+
+                vector<AgentAction_e> actions;
+
                 for(uint32_t k=0; k<agent_list.size(); k++)
                 {
                     Agent *agent = agent_list[k].get();
@@ -86,20 +89,25 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
                     if(!qagent->getTaskComplete())
                     {
                         int orig_state = qagent->getAgentState();
-                        AgentAction_e action = qagent->get_next_action(_epsilon, tester.learning_params);
+                        std::vector<AgentAction_e> actions;
+                        actions.push_back(qagent->get_next_action(_epsilon, tester.learning_params));
                         
                         // outputs: reward, labels, new_state
                         int reward=0;
                         std::vector<Event> labels;
-                        int new_state=0;
-                        p_train_env[j]->environmentStep(k, action, reward, labels, new_state);
+                        std::vector<int> new_state;
+                        p_train_env[j]->environmentStep(actions, reward, labels, new_state);
 
 
 
 
-                        agent_list[k]->performAction(action);
+                        // TODO: Maybe have update_agent update the agent's state instead of this?
+                        //agent_list[k]->performAction(action);
                     }
                 }
+
+
+
 
                 // Next, update environment after agents move
                 p_train_env[j]->updateEnvironment();

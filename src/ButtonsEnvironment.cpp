@@ -195,6 +195,9 @@ void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
                 break;
         }
     }
+
+    // Initialize reward machine
+    u=reward_machine->get_initial_state();
 }
 
 void ButtonsEnvironment::enableGreenBarrier(bool _enable)
@@ -281,21 +284,25 @@ void ButtonsEnvironment::updateEnvironment()
     }
 }
 
-void ButtonsEnvironment::environmentStep(int _agent_idx, AgentAction_e _action, int &_reward, std::vector<Event> &_labels, int &_new_state)
+void ButtonsEnvironment::environmentStep(std::vector<AgentAction_e> &_action, int &_reward, std::vector<Event> &_labels, std::vector<int> &_new_state)
 {
+    assert(_action.size()==agents.size());
     _reward=0;
     _labels.clear();
-    _new_state = agents[_agent_idx]->getAgentState();
+    _new_state.clear();
 
-    // TODO: Change action if slip (probably 0.98 no slip) - no reason to save last_action since it isn't used
-    AgentAction_e action = _action;
-    
-    // simulate action. need to keep agent in same state and update during Q learning
-    // update_agent will convert state to new location
-    _new_state = agents[_agent_idx]->simulateAction(action);
+    for(uint32_t i=0; i<agents.size(); i++)
+    {
+        // TODO: Change action if slip (probability 0.98 no slip) - no reason to save last_action since it isn't used
+        AgentAction_e action = _action[i];
+
+        // simulate action. need to keep agent in same state and update during Q learning
+        // update_agent will convert state to new location
+        _new_state.push_back(agents[i]->simulateAction(action));
+    }
 
     // get MDP label
-    getMDPLabel(_new_state, _labels);
+    getMDPLabel(_new_state, u, _labels);
 
 
     // get reward
@@ -429,21 +436,131 @@ bool ButtonsEnvironment::solved()
     return rv;
 }
 
-void ButtonsEnvironment::getMDPLabel(MachineState _u, std::vector<Event> &_labels)
+void ButtonsEnvironment::getMDPLabel(std::vector<int> &_next_state, MachineState _u, std::vector<Event> &_labels)
 {
+    double thresh = 0.3;
+
+    std::vector<ofVec2f> next_loc;
+    for(uint32_t i=0; i<_next_state.size(); i++)
+    {
+        next_loc.push_back(ofVec2f(_next_state[i]%GRID_C,_next_state[i]/GRID_C));
+    }
+    
     switch(cfg)
     {
         case AGENT1_ENV:
-            // Like buttons_env:get_mdp_label, where agent_id==1
+            assert(next_loc.size()==1);
+            if((_u==0) && (next_loc[0]==yellow_button_loc)) {
+                _labels.push_back(std::string("by"));
+            }
+            if(_u==1) {
+                double randn = double(rand()) / double(RAND_MAX);
+                if(randn<=thresh) {
+                    _labels.push_back(std::string("br"));
+                }
+            }
+            if((_u==2) && (next_loc[0]==goal_loc)) {
+                _labels.push_back(std::string("g"));
+            }
             break;
         case AGENT2_ENV:
-            // Like buttons_env:get_mdp_label, where agent_id==2
+            assert(next_loc.size()==1);
+            if(_u==0) {
+                double randn = double(rand()) / double(RAND_MAX);
+                if(randn<=thresh) {
+                    _labels.push_back(std::string("by"));
+                }
+            }
+            if((_u==1) && (next_loc[0]==green_button_loc)) {
+                _labels.push_back(std::string("bg"));
+            }
+            if((_u==2) && (next_loc[0]==red_button_loc)) {
+                _labels.push_back(std::string("a2br"));
+            }
+            if(_u==3) {
+                if(next_loc[0]!=red_button_loc) {
+                    _labels.push_back(std::string("a2lr"));
+                }
+                else {
+                    double randn = double(rand()) / double(RAND_MAX);
+                    if(randn<=thresh) {
+                        _labels.push_back(std::string("br"));
+                    }
+                }
+            }
             break;
         case AGENT3_ENV:
-            // Like buttons_env:get_mdp_label, where agent_id==3
+            assert(next_loc.size()==1);
+            if(_u==0) {
+                double randn = double(rand()) / double(RAND_MAX);
+                if(randn<=thresh) {
+                    _labels.push_back(std::string("bg"));
+                }
+            }
+            if((_u==1) && (next_loc[0]==red_button_loc)) {
+                _labels.push_back(std::string("a3br"));
+            }
+            if(_u==2) {
+                if(next_loc[0]!=red_button_loc) {
+                    _labels.push_back(std::string("a3lr"));
+                }
+                else {
+                    double randn = double(rand()) / double(RAND_MAX);
+                    if(randn<=thresh) {
+                        _labels.push_back(std::string("br"));
+                    }
+                }
+            }
             break;
         case TEAM_ENV:
+            assert(next_loc.size()==3);
             // Like multi_agent_buttons_env:get_mdp_label
+            if((_u==0) && (next_loc[0]==yellow_button_loc)) {
+                _labels.push_back(std::string("by"));
+            }
+            if((_u==1) && (next_loc[1]==green_button_loc)) {
+                _labels.push_back(std::string("bg"));
+            }
+            if(_u==2) {
+                if(next_loc[1]==red_button_loc) {
+                    _labels.push_back(std::string("a2br"));
+                }
+                if(next_loc[2]==red_button_loc) {
+                    _labels.push_back(std::string("a3br"));
+                }
+            }
+            if(_u==3) {
+                if(next_loc[1]!=red_button_loc) {
+                    _labels.push_back(std::string("a2lr"));
+                }
+                if(next_loc[2]==red_button_loc) {
+                    _labels.push_back(std::string("a3br"));
+                }
+            }
+            if(_u==4) {
+                if(next_loc[1]==red_button_loc) {
+                    _labels.push_back(std::string("a2br"));
+                }
+                if(next_loc[2]!=red_button_loc) {
+                    _labels.push_back(std::string("a3lr"));
+                }
+            }
+            if(_u==5) {
+                if((next_loc[1]==red_button_loc) && (next_loc[2]==red_button_loc)) {
+                    _labels.push_back(std::string("br"));
+                }
+                if(next_loc[1]!=red_button_loc) {
+                    _labels.push_back(std::string("a2lr"));
+                }
+                if(next_loc[2]!=red_button_loc) {
+                    _labels.push_back(std::string("a3lr"));
+                }
+            }
+            if(_u==6) {
+                if(next_loc[0]==goal_loc) {
+                    _labels.push_back(std::string("g"));
+                }
+            }
             break;
         default:
             break;

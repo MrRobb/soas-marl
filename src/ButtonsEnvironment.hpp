@@ -132,11 +132,11 @@ public:
 	void go(uint64_t _timer_interval, int _tick_limit);
     bool isOpen(ofVec2f _loc);  // Check if agent can move into grid square
 	void updateEnvironment();    // Run automatic tasks like lowering barriers when buttons are pressed
-	void environmentStep(int _agent_idx, AgentAction_e _action, int &_reward, std::vector<Event> &_labels, int &_new_state);   // Duplicates some other code, but need to split for Q-Learning
+	void environmentStep(std::vector<AgentAction_e> &_action, int &_reward, std::vector<Event> &_labels, std::vector<int> &_new_state);   // Duplicates some other code, but need to split for Q-Learning
 	void broadcastRandomEvent(); // TODO: Placeholder until I see how to integrate with Rob's code
     bool solved();
     vector<std::shared_ptr<Agent>> &getAgents() { return agents; }
-    void getMDPLabel(MachineState _u, std::vector<Event> &_labels);
+    void getMDPLabel(std::vector<int> &_next_state, MachineState _u, std::vector<Event> &_labels);
 
 
 private:
