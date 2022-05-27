@@ -292,6 +292,9 @@ void ButtonsEnvironment::environmentStep(std::vector<AgentAction_e> &_action, in
         _new_state.push_back(agents[i]->simulateAction(action));
     }
 
+    // Note: The environment is actually updated in other steps, so this function can be the same
+    //       for single (training) and multi (test) agent cases
+
     // get MDP label
     getMDPLabel(_new_state, u, _labels);
 
@@ -304,6 +307,7 @@ void ButtonsEnvironment::environmentStep(std::vector<AgentAction_e> &_action, in
         // Update the reward machine state
         this->u = u2;
     }
+    if(_reward>0)  { printf("Reward: %d\n", _reward); }
 }
 
 void ButtonsEnvironment::broadcastRandomEvent()
@@ -438,6 +442,7 @@ bool ButtonsEnvironment::solved()
 void ButtonsEnvironment::getMDPLabel(std::vector<int> &_next_state, MachineState _u, std::vector<Event> &_labels)
 {
     double thresh = 0.3;
+    _labels.clear();
 
     std::vector<ofVec2f> next_loc;
     for(uint32_t i=0; i<_next_state.size(); i++)

@@ -77,7 +77,7 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
             // Only need to run the environments that have not solved their task
             if(!p_train_env[j]->solved())
             {
-                // First, deal with agent movement
+                // First, deal with agent movement (should be one agent per environment)
                 vector<shared_ptr<Agent>> &agent_list = p_train_env[j]->getAgents();
 
                 for(uint32_t k=0; k<agent_list.size(); k++)
@@ -88,6 +88,7 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
 
                     if(!qagent->getTaskComplete())
                     {
+                        MachineState current_u = qagent->getCurrentU();
                         MachineState orig_state = qagent->getAgentState();
                         std::vector<AgentAction_e> actions {};
                         actions.push_back(qagent->get_next_action(_epsilon, tester.learning_params));
@@ -99,16 +100,46 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
                         p_train_env[j]->environmentStep(actions, reward, labels, new_state);
 
                         qagent->update_agent(new_state[k], actions[k], reward, labels, tester.learning_params);
+
+                        // TODO: Need to update Q function for other RM transitions here
+                        // U=qagent->getUSet()
+                        // Need to either get rm.T or method that checks if u is in T (probably better)
+                        for(auto u : qagent->getUSet())
+                        {
+                            if((u!=current_u)&&(!qagent->isUinT(u)))
+                            {
+                                labels.clear(); // Reuse labels, reward
+                                p_train_env[j]->getMDPLabel(new_state, u, labels);
+                                reward=0;
+                                MachineState u_temp = u;
+                                MachineState u2 = u;
+                                for( auto e : labels )
+                                {
+                                    u2 = qagent->getRM().get_next_state(u_temp, e);
+                                    reward = reward + qagent->getRM().get_reward(u_temp, u2);
+                                    u_temp = u2;
+                                }
+                                qagent->update_q_function(orig_state, new_state[k], u, u2, actions[k], reward, tester.learning_params );
+                            }
+                        }
+                    }
+                    else
+                    {
+                        printf("Task complete!\n");
                     }
                 }
 
+                // We still need to do this.
                 printf("Updating environment after agents move\n");
                 // Next, update environment after agents move
                 p_train_env[j]->updateEnvironment();
 
+                // I think this is taken care of now in the MDP label function
+                /*
                 printf("Broadcast random event\n");
                 // Last, broadcast a random event (no effect in TEAM_ENV)
                 p_train_env[j]->broadcastRandomEvent();
+                */
             }
         }
 

@@ -165,6 +165,18 @@ public:
         (this->delta_u.at(u).find(e) != this->delta_u.at(u).end());
     }
 
+    bool is_u_in_T(MachineState _u)
+    {
+        bool rv = false;
+
+        auto whereisit = T.find(_u);
+        if(whereisit!=T.end()) {
+            printf("True!\n");
+            rv = true;
+        }
+        return rv;
+    }
+
     static char *getRmBuf(SparseRewardMachineFlavor_e _flavor);
 };
 

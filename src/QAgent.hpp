@@ -164,4 +164,26 @@ public:
         double bellman = xt::amax(xt::view(this->q, s_new, u_new, xt::all()))[0];
         this->q(getAgentState(), u, a) = (1.0 - alpha) * this->q(getAgentState(), u, a) + alpha * (reward + gamma * bellman);
     }
+
+    MachineState getCurrentU()
+    {
+        return u;
+    }
+
+    std::set<MachineState> getUSet()
+    {
+        return rm.get_states();
+    }
+
+    bool isUinT(MachineState _u)
+    {
+        return rm.is_u_in_T(_u);
+    }
+
+    SparseRewardMachine &getRM()
+    {
+        return rm;
+    }
+
+
 };
