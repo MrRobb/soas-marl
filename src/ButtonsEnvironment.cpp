@@ -306,7 +306,13 @@ void ButtonsEnvironment::environmentStep(std::vector<AgentAction_e> &_action, in
 
 
     // get reward
-
+    for (const Event& e : _labels) {
+        // Get the new reward machine state and the reward of this step
+        MachineState u2 = this->reward_machine->get_next_state(this->u, e);
+        _reward += this->reward_machine->get_reward(this->u, u2);
+        // Update the reward machine state
+        this->u = u2;
+    }
 }
 
 void ButtonsEnvironment::broadcastRandomEvent()
