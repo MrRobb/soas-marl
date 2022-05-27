@@ -52,6 +52,12 @@ struct CellInfo
     // Maybe icon/shape once I know how that works?
 };
 
+typedef enum
+{
+    POLICY_RANDOM = 0,
+    POLICY_DQPRM = 1
+} Policy_e;
+
 class CellTypeInfo
 {
 public:
@@ -118,6 +124,7 @@ private:
     ButtonsEnvironmentThread env_thread;
     vector<std::shared_ptr<Agent>> agents;
     ButtonsEnvironmentConfig_e cfg;
+    Policy_e policy = POLICY_RANDOM;
     bool goal_reached;
 
 public:
@@ -125,6 +132,7 @@ public:
 
     void reset(bool _recreate_agents);
 
+    void setPolicy(const Policy_e& policy);
 	void setConfig(ButtonsEnvironmentConfig_e _cfg);    // Set up agent config for environment
 
 	void tick();    // Run environment and agents inside it for one cycle

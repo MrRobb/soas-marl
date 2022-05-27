@@ -10,14 +10,6 @@
 #include "soas_marl.h"
 #include "QAgent.hpp"
 
-typedef enum
-{
-    POLICY_RANDOM = 0,
-    POLICY_DQPRM = 1
-} Policy_e;
-
-Policy_e Policy = POLICY_RANDOM;
-
 void ButtonsEnvironmentThread::threadedFunction()
 {
     // Initialize things before main loop
@@ -131,12 +123,16 @@ void ButtonsEnvironment::resetAgentPositions()
     }
 }
 
+void ButtonsEnvironment::setPolicy(const Policy_e &policy) {
+    this->policy = policy;
+}
+
 void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
 {
     cfg = _cfg;
     agents.clear();
 
-    if(Policy==POLICY_RANDOM)
+    if(this->policy == POLICY_RANDOM)
     {
         switch(cfg)
         {
@@ -163,13 +159,8 @@ void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
                 break;
         }
     }
-    else if(Policy==POLICY_DQPRM)
+    else if(this->policy == POLICY_DQPRM)
     {
-        // DELETE WHEN IMPLEMENTED
-        // Also, change agent type below to appropriate class (DqprmAgent?)
-        printf("Not implemented!");
-        assert(1==0);
-        // END DELETE WHEN IMPLEMENTED
         switch(cfg)
         {
             case AGENT1_ENV:

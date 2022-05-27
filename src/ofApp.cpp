@@ -65,6 +65,7 @@ void ofApp::keyPressed(int key){
             { TEAM_ENV, TEAM_ENV, EMPTY_ENV, EMPTY_ENV };
         for (int i = 0; i < 4; i++)
         {
+            envs[i].setPolicy(POLICY_RANDOM);
             envs[i].setConfig(cfgs[i]);
         }
         train_test_random_policy.registerTrainEnv(&envs[0]);
@@ -84,6 +85,7 @@ void ofApp::keyPressed(int key){
             { AGENT1_ENV, AGENT2_ENV, AGENT3_ENV, TEAM_ENV };
         for (int i = 0; i < 4; i++)
         {
+            envs[i].setPolicy(POLICY_DQPRM);
             envs[i].setConfig(cfgs[i]);
         }
         train_test_dqprm.registerTrainEnv1(&envs[0]);
