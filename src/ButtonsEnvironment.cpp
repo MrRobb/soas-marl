@@ -98,6 +98,10 @@ void ButtonsEnvironment::reset(bool _recreate_agents)
     goal_reached = false;
 
     // TODO: May need to reset reward machine here
+    // Initialize reward machine
+    if(nullptr!=reward_machine) {
+        u=reward_machine->get_initial_state();
+    }
 }
 
 void ButtonsEnvironment::resetAgentPositions()
@@ -189,7 +193,9 @@ void ButtonsEnvironment::setConfig(ButtonsEnvironmentConfig_e _cfg)
     }
 
     // Initialize reward machine
-    u=reward_machine->get_initial_state();
+    if(nullptr!=reward_machine) {
+        u=reward_machine->get_initial_state();
+    }
 }
 
 void ButtonsEnvironment::enableGreenBarrier(bool _enable)
