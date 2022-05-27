@@ -62,6 +62,7 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
     p_train_env[2]->reset(false);
     for(uint32_t i=0; i<tester.learning_params.getMaxTsPerTask(); i++)
     {
+        printf("Wait for interval\n");
         if(timer_interval > 0)
         {
             timer.waitNext();
@@ -72,8 +73,8 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
         // Run for one tick in each training environment
         for(uint32_t j=0; j<3; j++)
         {
+            printf("Updating environment: %d\n", j);
             // Only need to run the environments that have not solved their task
-            // TODO: solved() needs to be updated based on the RM
             if(!p_train_env[j]->solved())
             {
                 // First, deal with agent movement
@@ -81,6 +82,7 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
 
                 for(uint32_t k=0; k<agent_list.size(); k++)
                 {
+                    printf("Updating agent: %d\n", k);
                     Agent *agent = agent_list[k].get();
                     QAgent *qagent = dynamic_cast<QAgent *>(agent);
 
@@ -100,17 +102,17 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
                     }
                 }
 
-
-
-
+                printf("Updating environment after agents move\n");
                 // Next, update environment after agents move
                 p_train_env[j]->updateEnvironment();
 
+                printf("Broadcast random event\n");
                 // Last, broadcast a random event (no effect in TEAM_ENV)
                 p_train_env[j]->broadcastRandomEvent();
             }
         }
 
+        printf("Check if we need to run a test step\n");
         // Check if we need to run a test step
         if( tester.testing_params.getTest() &&
             (0 == (tester.getCurrentStep() % tester.testing_params.getTestFreq()) ) )
@@ -118,6 +120,7 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
             runTest();
         }
 
+        
         // Note: we're checking the environment for "solved" rather than each agent for "task complete"
         if( p_train_env[0]->solved() && p_train_env[1]->solved() && p_train_env[2]->solved() )
         {
