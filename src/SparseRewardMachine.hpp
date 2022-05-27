@@ -73,9 +73,9 @@ protected:
     }
     
     bool is_terminal(const MachineState& u1) {
-        for (auto& [key, value] : this->delta_r) {
-            if (value.find(u1) != value.end()) {
-                if (value.at(u1) == 1) {
+        for (auto& u0 : this->delta_r) {
+            if (u0.second.find(u1) != u0.second.end()) {
+                if (u0.second.at(u1) == 1) {
                     return true;
                 }
             }
