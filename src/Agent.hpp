@@ -44,6 +44,9 @@ public:
     int simulateAction(AgentAction_e _action);
     ofVec2f getLocation() { return location; }
     void setLocation(ofVec2f _loc) { location = _loc; }  // Should only be called to initialize environment
+    virtual void resetAgent(ofVec2f _initial_location) {
+        this->location = _initial_location;
+    }
 
     int getAgentState();  // Helper function for Q-Learning state
 

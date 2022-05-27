@@ -164,6 +164,11 @@ public:
         double bellman = xt::amax(xt::view(this->q, s_new, u_new, xt::all()))[0];
         this->q(getAgentState(), u, a) = (1.0 - alpha) * this->q(getAgentState(), u, a) + alpha * (reward + gamma * bellman);
     }
+    
+    virtual void resetAgent(ofVec2f _initial_location) override {
+        this->location = _initial_location;
+        this->initialize_reward_machine();
+    }
 
     MachineState getCurrentU()
     {

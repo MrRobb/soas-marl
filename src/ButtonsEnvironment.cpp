@@ -105,18 +105,19 @@ void ButtonsEnvironment::resetAgentPositions()
     switch(cfg)
     {
         case AGENT1_ENV:
-            agents[0]->setLocation(agent1_init_loc);
+            agents[0]->resetAgent(agent1_init_loc);
+            
             break;
         case AGENT2_ENV:
-            agents[0]->setLocation(agent2_init_loc);
+            agents[0]->resetAgent(agent2_init_loc);
             break;
         case AGENT3_ENV:
-            agents[0]->setLocation(agent3_init_loc);
+            agents[0]->resetAgent(agent3_init_loc);
             break;
         case TEAM_ENV:
-            agents[0]->setLocation(agent1_init_loc);
-            agents[1]->setLocation(agent2_init_loc);
-            agents[2]->setLocation(agent3_init_loc);
+            agents[0]->resetAgent(agent1_init_loc);
+            agents[1]->resetAgent(agent2_init_loc);
+            agents[2]->resetAgent(agent3_init_loc);
             break;
         default:
             break;
