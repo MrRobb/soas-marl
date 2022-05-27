@@ -420,26 +420,28 @@ void ButtonsEnvironment::drawAgent(ofFbo _fbo, Agent &_a)
 
 bool ButtonsEnvironment::solved()
 {
-    bool rv = false;
-
     switch(cfg)
     {
         case TEAM_ENV:
-            rv = goal_reached ? true : false;
+            return std::all_of(this->agents.cbegin(), this->agents.cend(), [](std::shared_ptr<Agent> agent){
+                return agent->getTaskComplete();
+            });
             break;
-
         case AGENT1_ENV:
+            return this->agents.at(0)->getTaskComplete();
+            break;
         case AGENT2_ENV:
+            return this->agents.at(1)->getTaskComplete();
+            break;
         case AGENT3_ENV:
+            return this->agents.at(2)->getTaskComplete();
+            break;
         default:
-            printf("ButtonsEnvironment::solved() not implemented for DQPRM!\n");
-            // Probably just check if RM is in terminal state. Alternatively, could check
-            // if agent has completed its task (which I think is the same thing).
-            rv = goal_reached ? true : false; // Remove this when implemented
+            return std::all_of(this->agents.cbegin(), this->agents.cend(), [](std::shared_ptr<Agent> agent){
+                return agent->getTaskComplete();
+            });
             break;
     }
-
-    return rv;
 }
 
 void ButtonsEnvironment::getMDPLabel(std::vector<int> &_next_state, MachineState _u, std::vector<Event> &_labels)
