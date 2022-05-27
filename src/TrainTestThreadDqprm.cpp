@@ -186,6 +186,7 @@ void TrainTestThreadDqprm::runTest()
 
     for(test_steps=0; test_steps<tester.testing_params.getNumSteps(); test_steps++)
     {
+        printf("Test timestep: %d\n", test_steps);
         if(timer_interval > 0)
         {
             timer.waitNext();
