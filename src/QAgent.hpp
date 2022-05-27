@@ -147,10 +147,14 @@ public:
         //this->s = s_new;
         // new_loc.x = s_new%GRID_C;
         // new_loc.y = s_new/GRID_C;
+        printf("Performing action %d\n", a);
+        this->performAction(a);
         
         if (this->rm.is_terminal_state(this->u)) {
             this->is_task_complete = true;
         }
+        
+        
     }
     
     void update_q_function(const MachineState& s, const MachineState& s_new, const MachineState& u, const MachineState& u_new, const AgentAction_e& a, const Reward& reward, LearningParameters& learning_params) {
