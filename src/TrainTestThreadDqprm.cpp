@@ -101,9 +101,9 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
 
                         qagent->update_agent(new_state[k], actions[k], reward, labels, tester.learning_params);
 
-                        // TODO: Need to update Q function for other RM transitions here
-                        // U=qagent->getUSet()
-                        // Need to either get rm.T or method that checks if u is in T (probably better)
+                        // Update Q function for other RM transitions here
+                        // This is a little strange, but seems to be one of the major differences between
+                        // standard multi-agent Q-Learning and DQPRM
                         for(auto u : qagent->getUSet())
                         {
                             if((u!=current_u)&&(!qagent->isUinT(u)))
