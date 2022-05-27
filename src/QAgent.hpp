@@ -24,6 +24,8 @@
 #include <xtensor/xarray.hpp>
 #include <xtensor/xbuilder.hpp>
 #include <xtensor/xview.hpp>
+#include <xtensor/xio.hpp>
+#include <xtensor/xadapt.hpp>
 #define PI 3.14159265358979323846
 
 
@@ -180,5 +182,16 @@ public:
         return rm;
     }
 
+    void absorbKnowledge(QAgent &_teacher)
+    {
+        // Copies the Q Table from another agent. Intended to be used to transfer knowledge
+        // from the agents in the training environment to the test environment
+        q=_teacher.q;
+    }
+
+    std::unordered_set<Event> &getLocalEventSet()
+    {
+        return local_event_set;
+    }
 
 };

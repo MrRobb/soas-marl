@@ -97,7 +97,6 @@ void ButtonsEnvironment::reset(bool _recreate_agents)
 
     goal_reached = false;
 
-    // TODO: May need to reset reward machine here
     // Initialize reward machine
     if(nullptr!=reward_machine) {
         u=reward_machine->get_initial_state();
