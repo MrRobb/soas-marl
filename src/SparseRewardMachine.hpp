@@ -73,9 +73,11 @@ protected:
     }
     
     bool is_terminal(const MachineState& u1) {
-        for (const auto& u0: this->delta_r) {
-            if ((this->delta_r).at(u0.first).find(u1) != (this->delta_r).at(u0.first).end()) {
-                return (this->delta_r).at(u0.first).at(u1) == 1;
+        for (auto& [key, value] : this->delta_r) {
+            if (value.find(u1) != value.end()) {
+                if (value.at(u1) == 1) {
+                    return true;
+                }
             }
         }
         return false;
@@ -111,7 +113,7 @@ public:
         }
         
         for (auto& u1: this->U) {
-            if (this->is_terminal_state(u1)) {
+            if (this->is_terminal(u1)) {
                 this->T.insert(u1);
             }
         }
