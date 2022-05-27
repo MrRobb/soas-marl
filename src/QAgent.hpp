@@ -42,22 +42,16 @@ private:
     bool is_task_complete = false;
     
 public:
-    
-    QAgent(SparseRewardMachineFlavor_e reward_machine, unsigned int num_states, int agent_id, ButtonsEnvironment &_env) :
-        Agent(_env),
-        rm (std::stringstream(SparseRewardMachine::getRmBuf(reward_machine))) {
-        this->agent_id = agent_id;
-        this->num_states = num_states;
-        this->u = this->rm.get_initial_state();
-        this->local_event_set = this->rm.get_events();
-        this->q = xt::zeros<double>({int(num_states), int(this->rm.get_states().size()), int(this->actions.size())});
-
-    }
 
     QAgent(SparseRewardMachineFlavor_e reward_machine, unsigned int num_states, int agent_id, ButtonsEnvironment &_env, ofVec2f _init_loc) :
         Agent(_env, _init_loc),
         rm (std::stringstream(SparseRewardMachine::getRmBuf(reward_machine))) {
         this->agent_id = agent_id;
+            
+        std::vector<AgentAction_e> actions = {
+            MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, STAY
+        };
+            
         this->actions = actions;
         this->num_states = num_states;
         this->u = this->rm.get_initial_state();
@@ -65,10 +59,6 @@ public:
         this->q = xt::zeros<double>({int(num_states), int(this->rm.get_states().size()), int(this->actions.size())});
     }
 
-    
-    void reset_state() {
-        // Environment should reset position. Can probably delete this
-    }
     
     virtual void initialize_reward_machine() {
         this->u = this->rm.get_initial_state();
