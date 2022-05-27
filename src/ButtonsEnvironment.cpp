@@ -456,6 +456,7 @@ void ButtonsEnvironment::getMDPLabel(std::vector<int> &_next_state, MachineState
                 double randn = double(rand()) / double(RAND_MAX);
                 if(randn<=thresh) {
                     _labels.push_back(std::string("br"));
+                    enableRedBarrier(false);
                 }
             }
             if((_u==2) && (next_loc[0]==goal_loc)) {
@@ -468,6 +469,7 @@ void ButtonsEnvironment::getMDPLabel(std::vector<int> &_next_state, MachineState
                 double randn = double(rand()) / double(RAND_MAX);
                 if(randn<=thresh) {
                     _labels.push_back(std::string("by"));
+                    enableYellowBarrier(false);
                 }
             }
             if((_u==1) && (next_loc[0]==green_button_loc)) {
@@ -484,6 +486,7 @@ void ButtonsEnvironment::getMDPLabel(std::vector<int> &_next_state, MachineState
                     double randn = double(rand()) / double(RAND_MAX);
                     if(randn<=thresh) {
                         _labels.push_back(std::string("br"));
+                        enableRedBarrier(false);
                     }
                 }
             }
@@ -494,6 +497,7 @@ void ButtonsEnvironment::getMDPLabel(std::vector<int> &_next_state, MachineState
                 double randn = double(rand()) / double(RAND_MAX);
                 if(randn<=thresh) {
                     _labels.push_back(std::string("bg"));
+                    enableGreenBarrier(false);
                 }
             }
             if((_u==1) && (next_loc[0]==red_button_loc)) {
@@ -507,6 +511,7 @@ void ButtonsEnvironment::getMDPLabel(std::vector<int> &_next_state, MachineState
                     double randn = double(rand()) / double(RAND_MAX);
                     if(randn<=thresh) {
                         _labels.push_back(std::string("br"));
+                        enableRedBarrier(false);
                     }
                 }
             }
