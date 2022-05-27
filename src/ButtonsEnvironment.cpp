@@ -422,27 +422,34 @@ void ButtonsEnvironment::drawAgent(ofFbo _fbo, Agent &_a)
 
 bool ButtonsEnvironment::solved()
 {
-    switch(cfg)
+    if(this->policy == POLICY_RANDOM)
     {
-        case TEAM_ENV:
-            return std::all_of(this->agents.cbegin(), this->agents.cend(), [](std::shared_ptr<Agent> agent){
-                return agent->getTaskComplete();
-            });
-            break;
-        case AGENT1_ENV:
-            return this->agents.at(0)->getTaskComplete();
-            break;
-        case AGENT2_ENV:
-            return this->agents.at(0)->getTaskComplete();
-            break;
-        case AGENT3_ENV:
-            return this->agents.at(0)->getTaskComplete();
-            break;
-        default:
-            return std::all_of(this->agents.cbegin(), this->agents.cend(), [](std::shared_ptr<Agent> agent){
-                return agent->getTaskComplete();
-            });
-            break;
+        return goal_reached;
+    }
+    else // POLICY_DQPRM
+    {
+        switch(cfg)
+        {
+            case TEAM_ENV:
+                return std::all_of(this->agents.cbegin(), this->agents.cend(), [](std::shared_ptr<Agent> agent){
+                    return agent->getTaskComplete();
+                });
+                break;
+            case AGENT1_ENV:
+                return this->agents.at(0)->getTaskComplete();
+                break;
+            case AGENT2_ENV:
+                return this->agents.at(0)->getTaskComplete();
+                break;
+            case AGENT3_ENV:
+                return this->agents.at(0)->getTaskComplete();
+                break;
+            default:
+                return std::all_of(this->agents.cbegin(), this->agents.cend(), [](std::shared_ptr<Agent> agent){
+                    return agent->getTaskComplete();
+                });
+                break;
+        }
     }
 }
 
