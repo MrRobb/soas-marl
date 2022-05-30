@@ -17,7 +17,9 @@ Note: For Linux, the xtensor and xtl packages needed to be installed from source
 * https://github.com/xtensor-stack/xtensor
 
 Essentially, you simply need to run a command like this, where `path_to_prefix` is likely `/usr` (although you may use a different path if you pass the correct cflags and ldflags to the compiler via config.make):
+
 `cmake -DCMAKE_INSTALL_PREFIX=path_to_prefix ..`
+
 `make install`
 
 For Mac OS, the command `brew install xtensor` should install the required libraries.
