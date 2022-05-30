@@ -80,22 +80,22 @@ private:
     // TODO: May need both team RM and list of RMs
 
     uint32_t current_step;
-
-    // TODO: Maybe store results here? The way it's done in python looks more complicated than
-    //       it needs to be, so maybe we can simplify it for our purposes. I think writing results
-    //       to a file and then plotting with python might make the most sense.
+    ofstream results_file;
 
 public:
     Tester() :
         learning_params(),
         testing_params(),
         step_unit(1000),
-        total_steps(250*1000),
+        total_steps(40*1000),
         min_steps(1),
         num_times(10),
         num_agents(3),
         current_step(0)
-    {};
+    {
+        results_file.open("results.csv");
+        results_file << "Training" << "," << "Testing" << endl;
+    };
     
     // Setters
     void setStepUnit(uint32_t _step_unit) { step_unit = _step_unit; }
@@ -117,5 +117,7 @@ public:
     bool stopLearning() { return total_steps <= current_step; }
     bool stopTask(uint32_t _step) { return min_steps <= _step; }
 
-
+    void saveResult(uint32_t num_steps) {
+        results_file << current_step << "," << num_steps << endl;
+    }
 };

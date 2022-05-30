@@ -177,6 +177,7 @@ void TrainTestThreadDqprm::runEpisode(double _epsilon)
         // If we have hit the total training steps, exit
         if(tester.stopLearning()) break;
     }
+    
     printf("End episode\n");
 
 }
@@ -292,7 +293,7 @@ void TrainTestThreadDqprm::runTest()
         }
     }
 
-    // TODO: Save test results for plotting (test_steps contains number of required steps)
+    tester.saveResult(test_steps);
 
     printf("End test\n");
 

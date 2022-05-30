@@ -46,7 +46,7 @@ void ofApp::update()
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    int num_envs = envs.size();
+    size_t num_envs = envs.size();
     for (int i=0; i<num_envs; i++)
     {
         env_locs[i];
@@ -125,7 +125,7 @@ void ofApp::keyPressed(int key){
         {
             //envs[i].go(500000000, 20);  // Go for 20 ticks at 0.5 sec/tick
             //envs[i].go(100000000, 200);  // Go for 200 ticks at 0.1 sec/tick
-            envs[i].go(10000000, 200);  // Go for 200 ticks at 100 Hz
+            envs[i].go(0, 200);  // Go for 200 ticks at 100 Hz
             //envs[i].go(0, 200);  // Go for 200 ticks as fast as CPU will allow
         }
     }
