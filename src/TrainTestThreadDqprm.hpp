@@ -35,6 +35,7 @@ public:
         step(0),
         epsilon(0)
     {
+        tester.learning_params.setGamma(0.99);
     }
 
     void registerTrainEnv1(ButtonsEnvironment *_p_env) { p_train_env[0] = _p_env; }
