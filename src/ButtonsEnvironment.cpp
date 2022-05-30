@@ -292,6 +292,10 @@ void ButtonsEnvironment::environmentStep(std::vector<AgentAction_e> &_action, in
     {
         // TODO: Change action if slip (probability 0.98 no slip) - no reason to save last_action since it isn't used
         AgentAction_e action = _action[i];
+        
+        if (((double) rand() / (double) RAND_MAX) < SLIP_PROBABILITY) {
+            action = (AgentAction_e) (rand() % NUM_ACTIONS);
+        }
 
         // simulate action. need to keep agent in same state and update during Q learning
         // update_agent will convert state to new location
