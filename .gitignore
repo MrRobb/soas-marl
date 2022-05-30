@@ -8,3 +8,7 @@ cscope.out
 
 # vim stuff
 *.swp
+
+.vscode/
+html/
+latex/

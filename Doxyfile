@@ -1,0 +1,15 @@
+INPUT = src/Agent.cpp src/Agent.hpp src/ButtonsAgentRandomPolicy.cpp src/ButtonsAgentRandomPolicy.hpp src/ButtonsEnvironment.cpp src/ButtonsEnvironment.hpp src/QAgent.cpp src/QAgent.hpp src/SparseRewardMachine.cpp src/SparseRewardMachine.hpp src/Tester.cpp src/Tester.hpp src/TrainTestThreadDqprm.cpp src/TrainTestThreadDqprm.hpp src/TrainTestThreadRandom.cpp src/TrainTestThreadRandom.hpp src/main.cpp src/ofApp.cpp src/ofApp.h src/soas_marl.h
+
+EXTRACT_ALL          = YES
+CLASS_DIAGRAMS      = YES
+CLASS_GRAPH      = YES
+HIDE_UNDOC_RELATIONS = NO
+HAVE_DOT             = YES
+CLASS_GRAPH          = YES
+COLLABORATION_GRAPH  = YES
+UML_LOOK             = YES
+UML_LIMIT_NUM_FIELDS = 50
+TEMPLATE_RELATIONS   = YES
+DOT_GRAPH_MAX_NODES  = 100
+MAX_DOT_GRAPH_DEPTH  = 0
+DOT_TRANSPARENT      = YES
