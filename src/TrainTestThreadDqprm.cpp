@@ -262,8 +262,9 @@ void TrainTestThreadDqprm::runTest()
                     {
                         if(qagent_list[i]->getLocalEventSet().find(e) != qagent_list[i]->getLocalEventSet().end() )
                         {
-                            // TODO: This isn't right. Need an element-by-element comparison.
-                            if(projected_l[j]!=projected_l[j])
+                            std::set<Event> s1(projected_l[i].begin(), projected_l[i].end());
+                            std::set<Event> s2(projected_l[i].begin(), projected_l[i].end());
+                            if(s1 != s2)
                             {
                                 projected_l[i] = std::vector<Event>();
                             }
