@@ -1,7 +1,20 @@
-# soas-marl
+# SOAS: Multi-Agent System Reinforcement Learning
+
 Multi-Agent Reinforcement Learning implementation for Self Organizing MultiAgent Systems (SOAS)
 
-Based on the paper "Reward Machines for Cooperative Multi-Agent Reinforcement Learning" by Neary, et al.
+Based on the paper ["Reward Machines for Cooperative Multi-Agent Reinforcement Learning"](https://arxiv.org/abs/2007.01962) by Neary, et al.
+
+## DEMO
+
+<p align="center">
+	<a href="https://youtu.be/5Q0Rl9En4BI">
+		<img src="assets/three_agent_button.png" width=55%>
+	</a>
+</p>
+
+Random Agent: [https://youtu.be/2_2QWqt3uFg](https://youtu.be/2_2QWqt3uFg)
+
+DQPRM Agent: [https://youtu.be/5Q0Rl9En4BI](https://youtu.be/5Q0Rl9En4BI)
 
 ## Compiling
 
@@ -18,11 +31,19 @@ Note: For Linux, the xtensor and xtl packages needed to be installed from source
 
 Essentially, you simply need to run a command like this, where `path_to_prefix` is likely `/usr` (although you may use a different path if you pass the correct cflags and ldflags to the compiler via config.make):
 
-`cmake -DCMAKE_INSTALL_PREFIX=path_to_prefix ..`
+```bash
+cmake -DCMAKE_INSTALL_PREFIX=path_to_prefix ..
+```
 
-`make install`
+```bash
+make install
+```
 
-For Mac OS, the command `brew install xtensor` should install the required libraries.
+For Mac OS, the following command should install the required libraries:
+
+```
+brew install xtensor
+```
 
 #### Prerequisite: openFrameworks
 
